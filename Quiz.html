@@ -4,26 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مسابقة باقات You</title>
-    <!-- 
-        *** ملاحظة هامة حول خطأ net::ERR_NAME_NOT_RESOLVED ***
-        هذا الخطأ غالبًا ما يعني أن متصفحك أو شبكتك لا تستطيع الوصول إلى خوادم Google Fonts.
-        تأكد من:
-        1. اتصالك بالإنترنت.
-        2. لا يوجد جدار حماية (Firewall) أو برنامج حماية يحظر الوصول إلى fonts.googleapis.com.
-        3. مسح ذاكرة التخزين المؤقت لـ DNS (ابحث عن "ipconfig /flushdns" لنظام Windows أو "sudo dscacheutil -flushcache" لنظام macOS).
-        4. جرب تغيير خادم DNS الخاص بك إلى خوادم عامة مثل Google DNS (8.8.8.8 و 8.8.4.4).
-        الكود هنا صحيح لربط خطوط جوجل فونتس.
-    -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CSS Styling -->
     <style>
-        /* CSS Styling - لا يوجد تغيير في CSS إلا ما يتعلق بعناصر تم إزالتها */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap'); /* استيراد خط القاهرة */
+
         :root {
             --primary-yellow: #ffcc4e;
             --black: #000000;
             --white: #ffffff;
-            --correct-green: rgba(144, 238, 144, 0.8);
-            --wrong-red: rgba(255, 99, 71, 0.8);
-            --glass-white: rgba(255, 255, 255, 0.7);
+            --correct-green: rgba(144, 238, 144, 0.8); /* أخضر فاتح أكثر وضوحًا */
+            --wrong-red: rgba(255, 99, 71, 0.8); /* أحمر أكثر وضوحًا */
+            --glass-white: rgba(255, 255, 255, 0.7); /* أبيض شفاف */
+            --dark-gray: #333;
         }
 
         body {
@@ -39,7 +31,7 @@
             text-align: right;
         }
 
-        .container-wrapper {
+        .quiz-wrapper, .welcome-screen, .quiz-end-screen, .leaderboard-screen {
             width: 100%;
             max-width: 450px;
             min-height: 100vh;
@@ -50,83 +42,26 @@
             padding: 20px;
             box-sizing: border-box;
             gap: 20px;
-            position: relative;
-        }
-        
-        #login-screen, #quiz-app, #leaderboard, #end-screen {
-            display: none;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: absolute;
+            position: absolute; /* لجعل الشاشات تتراكب */
             top: 0;
-            left: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: var(--primary-yellow);
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* مخفية مبدئيًا */
         }
         
-        #login-screen.active, #quiz-app.active, #leaderboard.active, #end-screen.active {
+        /* تفعيل الشاشة الافتراضية عند التحميل */
+        .welcome-screen {
             display: flex;
+            justify-content: center; /* لتوسيط المحتوى عمودياً */
+            align-items: center; /* لتوسيط المحتوى أفقياً */
+            text-align: center;
         }
 
-        h2, h3 {
-            color: var(--black);
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        h2 { font-size: 1.8em; line-height: 1.3; }
-        h3 { font-size: 1.5em; }
-
-        input[type="text"] {
-            width: 80%;
-            max-width: 300px;
-            padding: 15px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            border: 2px solid var(--black);
-            border-radius: 10px;
-            background-color: var(--glass-white);
-            color: var(--black);
-            text-align: right;
-            box-sizing: border-box;
-        }
-        input::placeholder {
-            color: #555;
-        }
-
-        .main-button {
-            background-color: var(--black);
-            color: var(--white);
-            border: none;
-            border-radius: 30px;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 80%;
-            max-width: 300px;
-            margin-top: 20px;
-        }
-        .main-button:hover:not(:disabled) {
-            background-color: #333;
-        }
-        .main-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* تنسيقات شاشة المسابقة (لا يوجد تغيير) */
         .header-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            width: 100%;
         }
 
         .score-display {
@@ -155,7 +90,6 @@
             text-align: center;
             margin-bottom: 30px;
             line-height: 1.4;
-            flex-grow: 1;
         }
 
         .options-container {
@@ -184,16 +118,17 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
         }
 
         .glass-option-button:hover:not(:disabled) {
             background-color: rgba(255, 255, 255, 0.9);
             transform: translateY(-2px);
         }
+
         .glass-option-button:active:not(:disabled) {
             transform: translateY(0);
         }
+
         .glass-option-button:disabled {
             cursor: not-allowed;
             opacity: 0.9;
@@ -207,408 +142,567 @@
             color: var(--black);
         }
 
-        #next-button {
+        .button-primary {
+            background-color: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 30px;
+            padding: 18px 35px;
+            font-size: 1.3em;
+            font-weight: bold;
             margin-top: auto;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
             align-self: center;
-            width: 80%;
-            max-width: 300px;
+        }
+        .button-primary:hover:not(:disabled) {
+            background-color: var(--dark-gray);
+        }
+        .button-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        /* تنسيقات لوحة المتصدرين (لا يوجد تغيير) */
-        #leaderboard ol {
-            list-style: none;
-            padding: 0;
-            width: 100%;
-            max-width: 300px;
-            text-align: right;
-        }
-        #leaderboard li {
-            background-color: var(--glass-white);
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-size: 1.1em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        #leaderboard li:first-child { font-weight: bold; color: #d4af37; }
-        #leaderboard li:nth-child(2) { font-weight: bold; color: #c0c0c0; }
-        #leaderboard li:nth-child(3) { font-weight: bold; color: #cd7f32; }
-
-        /* عند انتهاء المسابقة (لا يوجد تغيير) */
-        .quiz-end-screen {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-yellow);
+        /* شاشة الترحيب */
+        .welcome-screen h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
             color: var(--black);
-            padding: 20px;
-            box-sizing: border-box;
-            z-index: 1000;
         }
+        .welcome-screen p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .welcome-screen input[type="text"] {
+            width: calc(100% - 40px);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--black);
+            border-radius: 10px;
+            font-size: 1.1em;
+            text-align: right;
+            background-color: var(--glass-white);
+            color: var(--black);
+        }
+        .welcome-screen input::placeholder {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        .start-button {
+            margin-top: 0; /* لا يوجد هامش علوي إضافي */
+            max-width: 250px;
+        }
+        /* تنسيق الشعار */
+        .welcome-screen .logo {
+            width: 150px; /* حجم مناسب للشعار */
+            height: auto;
+            margin-bottom: 30px; /* مسافة تحت الشعار */
+        }
+
+        /* شاشة النهاية */
         .quiz-end-screen h2 {
             font-size: 2.5em;
             margin-bottom: 15px;
         }
         .quiz-end-screen p {
             font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .quiz-end-screen .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+        }
+        .quiz-end-screen .button-group .button-primary {
+            margin-top: 0; /* إلغاء الهامش التلقائي */
+        }
+        .whatsapp-share-button {
+            background-color: #25D366; /* لون واتساب أخضر */
+        }
+        .whatsapp-share-button:hover {
+            background-color: #1DA851;
+        }
+        .view-leaderboard-button {
+            background-color: #007bff; /* لون أزرق للوحة الصدارة */
+        }
+        .view-leaderboard-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* مؤقت السؤال */
+        .timer-bar-container {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 10px;
+            height: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: #4CAF50; /* أخضر */
+            border-radius: 10px;
+            animation: timer-countdown 20s linear forwards; /* 20 ثانية */
+            transform-origin: right; /* يبدأ التصغير من اليمين */
+        }
+        @keyframes timer-countdown {
+            from { width: 100%; background-color: #4CAF50; }
+            50% { background-color: #FFC107; } /* أصفر في المنتصف */
+            to { width: 0%; background-color: #F44336; } /* أحمر في النهاية */
+        }
+
+        /* لوحة الصدارة */
+        .leaderboard-screen {
+            justify-content: flex-start; /* يبدأ من الأعلى */
+            padding-top: 50px;
+        }
+        .leaderboard-screen h2 {
+            font-size: 2.2em;
             margin-bottom: 30px;
+        }
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+        .leaderboard-list li {
+            background-color: var(--glass-white);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .leaderboard-list li span:first-child {
+            flex-grow: 1;
+            text-align: right;
+        }
+        .leaderboard-list li span:last-child {
+            margin-left: 15px;
+            color: var(--dark-gray);
+        }
+        .leaderboard-screen .back-button {
+            margin-top: 30px;
+            max-width: 200px;
         }
 
     </style>
 </head>
 <body>
 
-<div class="container-wrapper">
-
-    <!-- شاشة تسجيل الدخول (مبسطة) -->
-    <div id="login-screen" class="active">
-        <h2>مرحباً بك في مسابقة الشركة اليمنية العمانية المتحدة للاتصالات الثقافية</h2>
-        <p>نتمنى لك وقتاً ممتعاً! الرجاء إدخال اسمك لبدء المسابقة.</p>
-        <input type="text" id="user-name" placeholder="الاسم الأول والأخير" required/><br>
-        <button id="start-quiz-btn" class="main-button">بدء المسابقة</button>
+    <!-- شاشة الترحيب -->
+    <div class="welcome-screen" id="welcome-screen">
+        <!-- هنا يتم إضافة الشعار -->
+        <img src="you.png" alt="You" class="logo"> 
+        <h1>مرحباً بك!</h1>
+        <p>مرحباً بك في مسابقة خاصة من اليمنية العمانية المتحدة للاتصالات، نتمنى لك وقتاً ممتعاً!</p>
+        <input type="text" id="user-name" placeholder="أدخل اسمك واللقب" dir="rtl">
+        <button class="button-primary start-button" id="start-quiz-button">ابدأ المسابقة</button>
     </div>
 
-    <!-- شاشة المسابقة -->
-    <div id="quiz-app">
+    <!-- شاشة المسابقة الرئيسية -->
+    <div class="quiz-wrapper" id="quiz-app">
         <div class="header-section">
             <span class="question-progress" id="question-progress">السؤال 1 من 10</span>
             <span class="score-display" id="score-display">0/10</span>
         </div>
-        <p class="question-text" id="question-text">السؤال سيظهر هنا</p>
-        <div class="options-container" id="options-container">
-            <!-- الخيارات تضاف هنا بواسطة JavaScript -->
+
+        <div class="timer-bar-container">
+            <div class="timer-bar" id="timer-bar"></div>
         </div>
-        <div class="feedback-message" id="feedback-message"></div>
-        <button id="next-button" class="main-button">التالي</button>
-    </div>
 
-    <!-- شاشة نهاية المسابقة -->
-    <div class="quiz-end-screen" id="end-screen">
-        <h2>تهانينا!</h2>
-        <p id="final-score-message">لقد أكملت المسابقة وحصلت على 0 من 10 نقاط.</p>
-        <button class="main-button" id="view-leaderboard-btn">عرض لوحة المتصدرين</button>
-        <button class="main-button" id="play-again-btn">إعادة اللعب</button>
-    </div>
+        <p class="question-text" id="question-text">السؤال سيظهر هنا؟</p>
 
-    <!-- لوحة المتصدرين -->
-    <div id="leaderboard">
-        <h2>أفضل اللاعبين</h2>
-        <ol id="top-players"></ol>
-        <button class="main-button" id="back-to-login-btn">العودة للصفحة الرئيسية</button>
-    </div>
-
-</div> <!-- نهاية container-wrapper -->
-
-<!-- 
-    *** ملاحظة هامة حول خطأ net::ERR_NAME_NOT_RESOLVED ***
-    نفس الملاحظات المذكورة أعلاه تنطبق هنا على مكتبات JS الخارجية.
-    تأكد من إمكانية الوصول إلى cdn.jsdelivr.net و www.gstatic.com.
--->
-<!-- استيراد مكتبة قصاصات الورق هنا في نهاية الـ body -->
-<script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.min.js"></script>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-    import { getDatabase, ref, runTransaction, query, orderByChild, limitToLast, get, set } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js";
-
-    // لا تنس تغيير هذه الإعدادات بمعلومات مشروع Firebase الخاص بك
-    const firebaseConfig = {
-      apiKey: "AIzaSyB1AxV2Us1_iZUUx2MjIJ7AXSE3fxbsDes", 
-      authDomain: "alshahidi-569eb.firebaseapp.com",
-      projectId: "alshahidi-569eb",
-      storageBucket: "alshahidi-569eb.firebasestorage.app",
-      messagingSenderId: "32902511352",
-      appId: "1:32902511352:web:b816f430ce6d4c34d4190d",
-      measurementId: "G-6RDVPPYTZL"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // تهيئة مكتبة قصاصات الورق
-    const jsConfetti = new JSConfetti();
-
-    let questions = [
-        {id: 1, question: "ما هو سعر باقة 'سمارت فورجي 0.5 جيجا' لمدة 24 ساعة؟", options:["أ) 266 ريال","ب) 484 ريال","ج) 1,452 ريال"], correctAnswerIndex:0},
-        {id: 2, question: "كم جيجا إنترنت متوفرة في باقة 'سمارت فورجي 3 جيجا' لمدة 7 أيام؟", options:["أ) 1 جيجا","ب) 3 جيجا","ج) 5 جيجا"], correctAnswerIndex:1},
-        {id: 3, question: "ما هو سعر باقة 'سمارت فورجي 5 جيجا' لمدة 14 يومًا؟", options:["أ) 1,452 ريال","ب) 2,420 ريال","ج) 3,485 ريال"], correctAnswerIndex:1},
-        {id: 4, question: "كم عدد الدقائق داخل الشبكة لباقة 'سمارت فورجي 8 جيجا' لمدة 30 يومًا؟", options:["أ) 0","ب) 2","ج) 5"], correctAnswerIndex:0},
-        {id: 5, question: "ما هو رمز الشراء لباقة 'وفر فورجي 9 جيجا'؟", options:["أ) *551*33#","ب) *551*38#","ج) *551*42#"], correctAnswerIndex:2},
-        {id: 6, question: "كم جيجا إنترنت (طوال اليوم) متوفرة في باقة 'مكس فورجي 1.5 جيجا'؟", options:["أ) 1.5 جيجا","ب) 6 جيجا","ج) 10 جيجا"], correctAnswerIndex:0},
-        {id: 7, question: "ما هو عدد الرسائل النصية داخل وخارج الشبكة في باقة 'مكس فورجي 6 جيجا'؟", options:["أ) 90 رسالة","ب) 100 رسالة","ج) 120 رسالة"], correctAnswerIndex:0},
-        {id: 8, question: "ما هو سعر باقة 'مكس فورجي 10 جيجا' لمدة 30 يومًا؟", options:["أ) 3,412 ريال","ب) 5,990 ريال","ج) 14,714 ريال"], correctAnswerIndex:1},
-        {id: 9, question: "كم دقيقة داخل الشبكة متوفرة في باقة 'مكس فورجي 30 جيجا'؟", options:["أ) 100 دقيقة","ب) 200 دقيقة","ج) 350 دقيقة"], correctAnswerIndex:2},
-        {id: 10, question: "ما هو الرمز المشترك لطلب الباقات؟", options:["أ) *551*1#","ب) *551*555*1#","ج) *555*1#"], correctAnswerIndex:2}
-    ];
-
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let hasAnswered = false;
-    let currentUser = null; 
-    let userName = ''; 
-
-    // عناصر الواجهة
-    const loginScreen = document.getElementById('login-screen');
-    const quizApp = document.getElementById('quiz-app');
-    const leaderboardContainer = document.getElementById('leaderboard');
-    const endScreen = document.getElementById('end-screen'); 
-
-    const userNameInput = document.getElementById('user-name');
-    const startQuizButton = document.getElementById('start-quiz-btn'); 
-
-    const questionTextElement = document.getElementById('question-text');
-    const optionsContainer = document.getElementById('options-container');
-    const feedbackMessage = document.getElementById('feedback-message');
-    const nextButton = document.getElementById('next-button');
-    const scoreDisplay = document.getElementById('score-display');
-    const questionProgress = document.getElementById('question-progress');
-
-    const finalScoreMessage = document.getElementById('final-score-message');
-    const viewLeaderboardButton = document.getElementById('view-leaderboard-btn');
-    const playAgainButton = document.getElementById('play-again-btn');
-
-    const topPlayersList = document.getElementById('top-players');
-    const backToLoginButton = document.getElementById('back-to-login-btn');
-
-
-    // ======= وظائف عرض الشاشات =======
-    function showScreen(screenId) {
-        [loginScreen, quizApp, leaderboardContainer, endScreen].forEach(screen => {
-            if (screen && screen.id === screenId) { 
-                screen.classList.add('active');
-            } else if (screen) {
-                screen.classList.remove('active');
-            }
-        });
-    }
-
-    // ====== وظائف بسيطة لتوليد ID فريد للمستخدم ======
-    function generateUniqueId() {
-        return 'guest_' + Math.random().toString(36).substr(2, 9) + Date.now();
-    }
-
-    // ====== وظيفة التحقق من وجود مستخدم حالي (من localStorage) ======
-    function loadCurrentUserFromStorage() {
-        const storedUser = localStorage.getItem('quizCurrentUser');
-        if (storedUser) {
-            currentUser = JSON.parse(storedUser);
-            userNameInput.value = currentUser.name; // لملء حقل الاسم تلقائيًا
-            return true;
-        }
-        return false;
-    }
-
-    // ====== عند تحميل الصفحة، حاول تحميل المستخدم من localStorage ======
-    document.addEventListener('DOMContentLoaded', () => {
-        if (loadCurrentUserFromStorage()) {
-            showScreen('quiz-app'); // إذا كان هناك مستخدم سابق، ابدأ المسابقة مباشرة
-            initializeQuiz();
-        } else {
-            showScreen('login-screen'); // وإلا، اذهب إلى شاشة تسجيل الدخول
-        }
-    });
-
-
-    // =========== معالج حدث زر بدء المسابقة ==========
-    startQuizButton.addEventListener('click', async () => { // جعل الوظيفة غير متزامنة
-        userName = userNameInput.value.trim();
-
-        if (!userName) {
-            alert('الرجاء إدخال الاسم الأول والأخير.');
-            return;
-        }
+        <div class="options-container" id="options-container">
+            <button class="glass-option-button">الخيار 1</button>
+            <button class="glass-option-button">الخيار 2</button>
+            <button class="glass-option-button">الخيار 3</button>
+        </div>
         
-        // إنشاء كائن مستخدم وهمي لتمثيل المستخدم الحالي أو تحديثه
-        if (!currentUser || currentUser.name !== userName) { // إذا لم يكن هناك مستخدم أو تغير الاسم
-            currentUser = {
-                uid: generateUniqueId(), 
-                name: userName
-            };
-            localStorage.setItem('quizCurrentUser', JSON.stringify(currentUser)); // حفظ في localStorage
-        }
+        <div class="feedback-message" id="feedback-message"></div>
 
-        try {
-            // حفظ الاسم في Realtime Database لأول مرة أو تحديثه
-            await set(ref(db, `users/${currentUser.uid}`), {
-                name: currentUser.name,
-                lastLogin: Date.now()
-            });
-            console.log("User data saved/updated in Firebase:", currentUser); // للتتبع
-            initializeQuiz(); // بدء المسابقة مباشرة
-            showScreen('quiz-app');
-        } catch (error) {
-            console.error("Error saving user data to Firebase:", error);
-            alert("فشل في بدء المسابقة بسبب مشكلة في قاعدة البيانات. يرجى مراجعة Console.");
-            // يمكن هنا عرض شاشة خطأ أو إعادة المستخدم إلى شاشة تسجيل الدخول
-            showScreen('login-screen'); 
-        }
-    });
+        <button class="button-primary" id="next-button">التالي</button>
+    </div>
 
-    // =========== Quiz Functions (بدون تغيير) ==========
-    function initializeQuiz() {
-        currentQuestionIndex = 0;
-        score = 0;
-        updateScoreDisplay();
-        displayQuestion(currentQuestionIndex);
-        nextButton.disabled = true;
-        feedbackMessage.innerText = '';
-    }
+    <!-- شاشة انتهاء المسابقة -->
+    <div class="quiz-end-screen" id="end-screen">
+        <h2 id="end-screen-greeting">تهانينا!</h2>
+        <p id="final-score-message">لقد أكملت المسابقة وحصلت على 0 من 10 نقاط.</p>
+        <p id="time-taken-message"></p>
+        <div class="button-group">
+            <button class="button-primary restart-button" id="restart-button">إعادة اللعب</button>
+            <button class="button-primary whatsapp-share-button" id="whatsapp-share-button">مشاركة النتيجة عبر واتساب</button>
+            <button class="button-primary view-leaderboard-button" id="view-leaderboard-button">عرض لوحة الصدارة</button>
+        </div>
+    </div>
 
-    function displayQuestion(index) {
-        hasAnswered = false;
-        const q = questions[index];
-        questionTextElement.innerText = q.question;
-        optionsContainer.innerHTML = '';
+    <!-- لوحة الصدارة -->
+    <div class="leaderboard-screen" id="leaderboard-screen">
+        <h2>أسرع 5 متسابقين</h2>
+        <ul class="leaderboard-list" id="leaderboard-list">
+            <!-- سيتم ملء هذه القائمة بواسطة JavaScript -->
+            <li><span>اسم المتسابق</span><span>الوقت: 00s</span></li>
+        </ul>
+        <button class="button-primary back-button" id="back-to-end-screen-button">العودة لشاشة النتائج</button>
+    </div>
 
-        q.options.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'glass-option-button'; 
-            btn.innerText = opt;
-            btn.onclick = () => handleAnswer(i, btn);
-            optionsContainer.appendChild(btn);
-        });
+    <!-- استيراد مكتبة قصاصات الورق والصوت -->
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.min.js"></script>
+    <audio id="correct-sound" src="https://www.soundjay.com/human/sounds/applause-2.mp3" preload="auto"></audio>
+    <audio id="wrong-sound" src="https://www.soundjay.com/buttons/sounds/button-7.mp3" preload="auto"></audio>
+    <audio id="timeout-sound" src="https://www.soundjay.com/buttons/sounds/button-6.mp3" preload="auto"></audio>
+    
+    <script>
+        const questions = [
+            {
+                id: 1,
+                question: "ما هو سعر باقة 'سمارت فورجي 0.5 جيجا' لمدة 24 ساعة؟",
+                options: ["أ) 266 ريال", "ب) 484 ريال", "ج) 1,452 ريال"],
+                correctAnswerIndex: 0
+            },
+            {
+                id: 2,
+                question: "كم فترة الاستقبال في باقة 'سمارت فورجي 3 جيجا'؟",
+                options: ["أ) 14 يوماً", "ب) 7 أيام", "ج) 10 أيام"],
+                correctAnswerIndex: 1
+            },
+            {
+                id: 3,
+                question: "ما هو سعر باقة 'سمارت فورجي 5 جيجا' لمدة 14 يومًا؟",
+                options: ["أ) 1,452 ريال", "ب) 2,420 ريال", "ج) 3,485 ريال"],
+                correctAnswerIndex: 1
+            },
+            {
+                id: 4,
+                question: "كم عدد الدقائق داخل الشبكة لباقة 'سمارت فورجي 8 جيجا' لمدة 30 يومًا؟",
+                options: ["أ) 0", "ب) 2", "ج) 5"],
+                correctAnswerIndex: 0
+            },
+            {
+                id: 5,
+                question: "ما هو رمز الشراء لباقة 'وفر فورجي 9 جيجا'؟",
+                options: ["أ) #33*551*", "ب) #38*551*", "ج) #42*551*"],
+                correctAnswerIndex: 2
+            },
+            {
+                id: 6,
+                question: "ماهي أكبر سعة في باقات 'مكس فورجي '؟",
+                options: ["أ) 20 جيجا", "ب) 30 جيجا", "ج) 10 جيجا"],
+                correctAnswerIndex: 0
+            },
+            {
+                id: 7,
+                question: "ما هو عدد الرسائل النصية داخل وخارج الشبكة في باقة 'مكس فورجي 6 جيجا'؟",
+                options: ["أ) 120 رسالة", "ب) 100 رسالة", "ج) 90 رسالة"],
+                correctAnswerIndex: 0
+            },
+            {
+                id: 8,
+                question: "ما هو سعر باقة 'مكس فورجي 10 جيجا' لمدة 30 يومًا؟",
+                options: ["أ) 3,412 ريال", "ب) 5,990 ريال", "ج) 14,714 ريال"],
+                correctAnswerIndex: 1
+            },
+            {
+                id: 9,
+                question: "كم دقيقة داخل الشبكة متوفرة في باقة 'مكس فورجي 30 جيجا'؟",
+                options: ["أ) 100 دقيقة", "ب) 200 دقيقة", "ج) 350 دقيقة"],
+                correctAnswerIndex: 2
+            },
+            {
+                id: 10,
+                question: "ما هو الرمز المشترك لطلب الباقات؟",
+                options: ["أ) #11*555*", "ب) #5*555*", "ج) #1*555*"],
+                correctAnswerIndex: 2
+            }
+        ];
 
-        feedbackMessage.innerText = '';
-        nextButton.disabled = true;
-        questionProgress.innerText = `السؤال ${index + 1} من ${questions.length}`;
-    }
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let hasAnsweredCurrentQuestion = false;
+        const totalQuestions = questions.length;
+        let userName = "ضيف";
+        let quizStartTime;
+        let quizEndTime;
+        let questionTimer;
+        const questionDuration = 20; // 20 ثانية لكل سؤال
+        let leaderboard = []; // تخزين لوحة الصدارة
 
-    function handleAnswer(index, btn) {
-        if (hasAnswered) return;
-        hasAnswered = true;
-        const correct = questions[currentQuestionIndex].correctAnswerIndex;
+        let jsConfetti; 
+        
+        // عناصر الواجهة
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const userNameInput = document.getElementById('user-name');
+        const startQuizButton = document.getElementById('start-quiz-button');
 
-        Array.from(optionsContainer.children).forEach(b => b.disabled = true);
+        const quizApp = document.getElementById('quiz-app');
+        const questionTextElement = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const questionProgress = document.getElementById('question-progress');
+        const nextButton = document.getElementById('next-button');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const timerBar = document.getElementById('timer-bar');
 
-        if (index === correct) {
-            score++;
-            btn.style.backgroundColor = 'var(--correct-green)';
-            feedbackMessage.innerText = 'إجابة صحيحة! 🎉';
-            feedbackMessage.style.color = 'darkgreen';
-        } else {
-            btn.style.backgroundColor = 'var(--wrong-red)';
-            optionsContainer.children[correct].style.backgroundColor = 'var(--correct-green)';
-            feedbackMessage.innerText = `إجابة خاطئة! ❌ الإجابة الصحيحة هي: ${questions[currentQuestionIndex].options[correct]}`;
-            feedbackMessage.style.color = 'darkred';
-        }
-        updateScoreDisplay();
-        nextButton.disabled = false;
-    }
+        const endScreen = document.getElementById('end-screen');
+        const endScreenGreeting = document.getElementById('end-screen-greeting');
+        const finalScoreMessage = document.getElementById('final-score-message');
+        const timeTakenMessage = document.getElementById('time-taken-message');
+        const restartButton = document.getElementById('restart-button');
+        const whatsappShareButton = document.getElementById('whatsapp-share-button');
+        const viewLeaderboardButton = document.getElementById('view-leaderboard-button');
 
-    function updateScoreDisplay() {
-        scoreDisplay.innerText = `${score}/${questions.length}`;
-    }
+        const leaderboardScreen = document.getElementById('leaderboard-screen');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const backToEndScreenButton = document.getElementById('back-to-end-screen-button');
 
-    nextButton.addEventListener('click', () => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-            displayQuestion(currentQuestionIndex);
-        } else {
-            onGameEnd(score);
-        }
-    });
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        const timeoutSound = document.getElementById('timeout-sound');
 
-    // =========== Leaderboard Functions (تعديلات بسيطة) ==========
-    async function submitScore(uid, name, score) {
-        const lbRef = ref(db, `leaderboard/${uid}`);
-        try {
-            await runTransaction(lbRef, (current) => {
-                const currentScore = current ? (current.score || 0) : 0;
-                if (score > currentScore) { 
-                    return { uid: uid, name: name, score: score, timestamp: Date.now() };
-                }
-                return; 
-            });
-            console.log("Score submitted/updated successfully for:", name);
-        } catch (error) {
-            console.error("Error submitting score to Firebase:", error);
-            alert("فشل في حفظ النتيجة في لوحة المتصدرين. يرجى مراجعة Console.");
-        }
-    }
+        // ====== تهيئة عند بدء المسابقة ======
+        function initializeQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            quizStartTime = null;
+            quizEndTime = null;
+            hasAnsweredCurrentQuestion = false;
 
-    async function fetchTopFive() {
-        try {
-            const leaderboardQuery = query(ref(db, 'leaderboard'), orderByChild('score'), limitToLast(5));
-            const snapshot = await get(leaderboardQuery);
-            const players = [];
-            snapshot.forEach(childSnapshot => {
-                players.push(childSnapshot.val());
-            });
+            welcomeScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            leaderboardScreen.style.display = 'none';
+            quizApp.style.display = 'flex'; // عرض شاشة المسابقة
             
-            players.sort((a, b) => b.score - a.score || a.timestamp - b.timestamp);
+            displayQuestion(currentQuestionIndex);
+            updateScoreDisplay();
+            nextButton.disabled = true;
+            feedbackMessage.innerText = '';
+            
+            quizStartTime = new Date(); // بدء احتساب الوقت للمسابقة
 
-            topPlayersList.innerHTML = '';
-            if (players.length === 0) {
-                const li = document.createElement('li');
-                li.innerText = "لا يوجد لاعبون بعد.";
-                topPlayersList.appendChild(li);
+            if (typeof JSConfetti !== 'undefined') {
+                jsConfetti = new JSConfetti();
             } else {
-                players.forEach(p => {
-                    const li = document.createElement('li');
-                    li.innerText = `${p.name}: ${p.score} نقطة`;
-                    topPlayersList.appendChild(li);
+                console.warn("JSConfetti library not loaded.");
+            }
+        }
+
+        // ====== عرض السؤال ======
+        function displayQuestion(index) {
+            hasAnsweredCurrentQuestion = false;
+            const questionData = questions[index];
+
+            questionTextElement.innerText = questionData.question;
+            optionsContainer.innerHTML = '';
+
+            questionData.options.forEach((optionText, optionIndex) => {
+                const optionButton = document.createElement('button');
+                optionButton.className = 'glass-option-button';
+                optionButton.innerText = optionText;
+                optionButton.onclick = () => handleAnswer(optionIndex, optionButton);
+                optionsContainer.appendChild(optionButton);
+            });
+
+            questionProgress.innerText = `السؤال ${index + 1} من ${totalQuestions}`;
+            nextButton.disabled = true;
+            feedbackMessage.innerText = '';
+
+            startQuestionTimer(); // بدء المؤقت لكل سؤال
+        }
+
+        // ====== بدء مؤقت السؤال ======
+        function startQuestionTimer() {
+            clearTimeout(questionTimer); // مسح أي مؤقت سابق
+            timerBar.style.width = '100%';
+            timerBar.style.backgroundColor = '#4CAF50';
+            timerBar.style.animation = 'none'; // إعادة ضبط الأنميشن
+            void timerBar.offsetWidth; // إعادة تدفق (reflow) لإعادة تشغيل الأنميشن
+            timerBar.style.animation = `timer-countdown ${questionDuration}s linear forwards`;
+
+            questionTimer = setTimeout(() => {
+                if (!hasAnsweredCurrentQuestion) {
+                    handleAnswer(-1); // إجابة خاطئة بسبب انتهاء الوقت
+                    timeoutSound.play();
+                    feedbackMessage.innerText = 'انتهى الوقت! ⏳';
+                    feedbackMessage.style.color = 'darkred';
+                    // إظهار الإجابة الصحيحة
+                    const questionData = questions[currentQuestionIndex];
+                    const correctIndex = questionData.correctAnswerIndex;
+                     Array.from(optionsContainer.children).forEach((button, index) => {
+                        button.disabled = true; // تعطيل كل الأزرار
+                        if (index === correctIndex) {
+                            button.style.backgroundColor = 'var(--correct-green)';
+                        }
+                    });
+                    nextButton.disabled = false;
+                }
+            }, questionDuration * 1000);
+        }
+
+        // ====== معالجة الإجابة عند النقر على خيار ======
+        function handleAnswer(selectedOptionIndex, clickedButton = null) {
+            if (hasAnsweredCurrentQuestion) {
+                return;
+            }
+            clearTimeout(questionTimer); // إيقاف المؤقت بمجرد الإجابة
+            hasAnsweredCurrentQuestion = true;
+
+            const questionData = questions[currentQuestionIndex];
+            const correctIndex = questionData.correctAnswerIndex;
+
+            // تعطيل جميع الخيارات لمنع النقر المتعدد
+            Array.from(optionsContainer.children).forEach(button => button.disabled = true);
+
+            if (selectedOptionIndex === correctIndex) {
+                score++;
+                if (clickedButton) clickedButton.style.backgroundColor = 'var(--correct-green)';
+                feedbackMessage.innerText = 'إجابة صحيحة! 🎉';
+                feedbackMessage.style.color = 'darkgreen';
+                correctSound.play(); // تشغيل صوت التصفيق
+            } else {
+                if (clickedButton) clickedButton.style.backgroundColor = 'var(--wrong-red)';
+                const correctOptionText = questionData.options[correctIndex];
+                feedbackMessage.innerText = `إجابة خاطئة! ❌ الإجابة الصحيحة هي: ${correctOptionText}`;
+                feedbackMessage.style.color = 'darkred';
+                wrongSound.play();
+                // إظهار الإجابة الصحيحة باللون الأخضر إذا كانت مختارة خاطئة
+                Array.from(optionsContainer.children).forEach((button, index) => {
+                    if (index === correctIndex) {
+                        button.style.backgroundColor = 'var(--correct-green)';
+                    }
                 });
             }
-            showScreen('leaderboard');
-        } catch (error) {
-            console.error("Error fetching leaderboard from Firebase:", error);
-            alert("فشل في تحميل لوحة المتصدرين. يرجى مراجعة Console.");
-            showScreen('end-screen'); // العودة إلى شاشة النهاية في حالة الفشل
+            updateScoreDisplay();
+            nextButton.disabled = false;
         }
-    }
 
-    async function onGameEnd(finalScore) {
-        if (!currentUser) {
-            console.error("No current user found when trying to end game.");
-            return;
+        // ====== تحديث عرض النتيجة في الواجهة ======
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `${score}/${totalQuestions}`;
         }
-        
-        await submitScore(currentUser.uid, currentUser.name, finalScore);
-        finalScoreMessage.innerText = `لقد أكملت المسابقة وحصلت على ${finalScore} من ${questions.length} نقاط.`;
-        showScreen('end-screen');
 
-        if (finalScore === questions.length) {
-            jsConfetti.addConfetti({
-                emojis: ['🎉', '🥳', '🌟', '✨'],
-                confettiNumber: 100
+        // ====== الانتقال للسؤال التالي أو إنهاء المسابقة ======
+        function goToNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < totalQuestions) {
+                displayQuestion(currentQuestionIndex);
+            } else {
+                endQuiz();
+            }
+        }
+
+        // ====== إنهاء المسابقة ======
+        function endQuiz() {
+            clearTimeout(questionTimer); // تأكد من إيقاف المؤقت الأخير
+            quizEndTime = new Date();
+            const timeTaken = (quizEndTime - quizStartTime) / 1000; // بالثواني
+
+            quizApp.style.display = 'none';
+            endScreen.style.display = 'flex';
+            
+            endScreenGreeting.innerText = `تهانينا، ${userName}!`;
+            finalScoreMessage.innerText = `لقد أكملت المسابقة وحصلت على ${score} من ${totalQuestions} نقاط.`;
+            timeTakenMessage.innerText = `استغرقت ${timeTaken.toFixed(1)} ثانية لإكمال المسابقة.`;
+
+            // حفظ النتيجة في لوحة الصدارة
+            if (score > 0) { // فقط إذا كان هناك نقاط
+                leaderboard.push({ name: userName, score: score, time: timeTaken });
+                leaderboard.sort((a, b) => {
+                    if (b.score !== a.score) {
+                        return b.score - a.score; // ترتيب تنازلي حسب النقاط
+                    }
+                    return a.time - b.time; // ترتيب تصاعدي حسب الوقت إذا تساوت النقاط
+                });
+                // الحفاظ على أفضل 5
+                leaderboard = leaderboard.slice(0, 5);
+                localStorage.setItem('quizLeaderboard', JSON.stringify(leaderboard));
+            }
+
+
+            if (score === totalQuestions && jsConfetti) {
+                jsConfetti.addConfetti({
+                    emojis: ['🎉', '🥳', '🌟', '✨'],
+                    confettiNumber: 100
+                });
+            } else if (score >= totalQuestions / 2 && jsConfetti) {
+                jsConfetti.addConfetti({
+                    emojis: ['👍', '👏'],
+                    confettiNumber: 50
+                });
+            }
+        }
+
+        // ====== عرض لوحة الصدارة ======
+        function displayLeaderboard() {
+            endScreen.style.display = 'none';
+            leaderboardScreen.style.display = 'flex';
+            leaderboardList.innerHTML = ''; // مسح القائمة الحالية
+
+            if (leaderboard.length === 0) {
+                leaderboardList.innerHTML = '<li>لا توجد نتائج بعد! كن أول من يجيب.</li>';
+                return;
+            }
+
+            leaderboard.forEach((entry, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<span>#${index + 1} ${entry.name}</span><span>${entry.score}/${totalQuestions} | ${entry.time.toFixed(1)} ثانية</span>`;
+                leaderboardList.appendChild(listItem);
             });
-        } else if (finalScore >= questions.length / 2) {
-            jsConfetti.addConfetti({
-                emojis: ['👍', '👏'],
-                confettiNumber: 50
-            });
         }
-    }
 
-    // ====== ربط أزرار شاشة النهاية ولوحة المتصدرين ======
-    viewLeaderboardButton.addEventListener('click', () => {
-        fetchTopFive();
-    });
+        // ====== مشاركة النتيجة عبر واتساب ======
+        function shareOnWhatsApp() {
+            const message = `لقد أكملت مسابقة باقات You وحصلت على ${score} من ${totalQuestions} نقاط في ${timeTakenMessage.innerText.replace('استغرقت ', '').replace('لإكمال المسابقة.', '')}! هل يمكنك أن تفعل أفضل؟ #مسابقة_You`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
 
-    playAgainButton.addEventListener('click', () => {
-        initializeQuiz();
-        showScreen('quiz-app'); 
-    });
+        // ====== ربط الأحداث ======
+        startQuizButton.addEventListener('click', () => {
+            const inputName = userNameInput.value.trim();
+            if (inputName) {
+                userName = inputName;
+            } else {
+                userName = "ضيف"; // إذا لم يدخل اسم
+            }
+            initializeQuiz();
+        });
 
-    backToLoginButton.addEventListener('click', () => {
-        userNameInput.value = '';
-        currentUser = null; 
-        localStorage.removeItem('quizCurrentUser'); // مسح المستخدم من localStorage
-        showScreen('login-screen');
-    });
+        nextButton.addEventListener('click', goToNextQuestion);
+        restartButton.addEventListener('click', () => {
+            userNameInput.value = ""; // مسح الاسم عند إعادة اللعب
+            welcomeScreen.style.display = 'flex';
+            endScreen.style.display = 'none';
+            quizApp.style.display = 'none';
+        });
+        whatsappShareButton.addEventListener('click', shareOnWhatsApp);
+        viewLeaderboardButton.addEventListener('click', displayLeaderboard);
+        backToEndScreenButton.addEventListener('click', () => {
+            leaderboardScreen.style.display = 'none';
+            endScreen.style.display = 'flex';
+        });
 
-</script>
-
+        // ====== البدء عند تحميل الصفحة ======
+        document.addEventListener('DOMContentLoaded', () => {
+            // تحميل لوحة الصدارة من التخزين المحلي
+            const storedLeaderboard = localStorage.getItem('quizLeaderboard');
+            if (storedLeaderboard) {
+                leaderboard = JSON.parse(storedLeaderboard);
+            }
+            welcomeScreen.style.display = 'flex'; // عرض شاشة الترحيب أولاً
+        });
+    </script>
 </body>
 </html>
