@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Communication - أهمية التواصل الداخلي</title>
+    <style>
+        /* المتغيرات الأساسية والألوان */
+        :root {
+            --primary-bg-color: #FFFFFF; /* خلفية معظم الصفحات (أبيض) */
+            --secondary-bg-color: #000000; /* خلفية الصفحة الأولى والشريط العلوي */
+            --highlight-color: #FFCC4E; /* الأصفر المطلوب */
+            --text-color-dark: #000000;
+            --text-color-light: #FFFFFF;
+            --font-family: 'Arial', sans-serif;
+            /* حجم الشاشة: 1080 عرض، 1920 ارتفاع (Portrait) */
+            --slide-width: 1080px;
+            --slide-height: 1920px;
+            --slide-padding-x: 80px; /* مسافة داخلية موحدة للعرض */
+            --content-width: calc(var(--slide-width) - (var(--slide-padding-x) * 2));
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0; 
+        }
+
+        .presentation-container {
+            width: var(--slide-width);
+            height: var(--slide-height);
+            position: relative; 
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            padding-top: 0;
+            box-sizing: border-box;
+            background-color: var(--primary-bg-color);
+            color: var(--text-color-dark);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* تنسيق الشريط العلوي الجديد لجميع الشرائح عدا الأولى */
+        .slide-header-wrapper {
+            width: 100%;
+            position: absolute;
+            top: 30px; 
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+        .slide-header {
+            width: 100%;
+            background-color: var(--secondary-bg-color);
+            color: var(--highlight-color);
+            padding: 30px 0;
+            box-sizing: border-box;
+        }
+        .slide-header h2 {
+            font-size: 3em;
+            margin: 0;
+            color: var(--highlight-color); 
+        }
+        
+        /* تعديل خاص للشريحة الأخيرة */
+        #slide8 {
+            background-color: var(--secondary-bg-color); /* خلفية سوداء */
+        }
+        #slide8 .slide-header {
+            background-color: var(--highlight-color); /* شريط علوي أصفر */
+        }
+        #slide8 .slide-header h2 {
+            color: var(--text-color-dark); /* عنوان أسود */
+        }
+
+
+        /* تنسيق الصفحة الأولى (الخلفية سوداء) - تم الحفاظ عليه دون شريط علوي */
+        #slide1 {
+            background-color: var(--secondary-bg-color);
+            color: var(--text-color-light);
+            justify-content: flex-start;
+            padding: 0; 
+        }
+        #slide1 .top-image-container {
+            width: 100%;
+            height: calc(var(--slide-height) / 3); 
+            overflow: hidden;
+        }
+        #slide1 .top-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #slide1 .logo-container {
+            margin-top: 60px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #slide1 .logo-container img {
+            max-width: 300px;
+            max-height: 100%;
+        }
+        #slide1 .main-title {
+            font-size: 3.5em;
+            margin-top: 80px;
+            padding: 0 50px;
+            color: var(--text-color-light);
+            line-height: 1.3;
+        }
+        #slide1 .subtitle-box {
+            background-color: var(--highlight-color);
+            color: var(--text-color-dark);
+            padding: 30px 60px;
+            border-radius: 10px; 
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 150px;
+        }
+
+        /* أنماط المحتوى لجميع الشرائح عدا الأولى */
+        .intro-box-yellow-wrapper {
+            width: 100%;
+            position: absolute;
+            top: 150px; 
+            display: flex;
+            justify-content: center;
+        }
+        .intro-box-yellow {
+            width: var(--content-width); 
+            background-color: var(--highlight-color); 
+            color: var(--text-color-dark);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px; 
+            font-size: 2.2em; 
+            font-weight: bold;
+            line-height: 1.5;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* تعديل المربع الأصفر في الشريحة الأخيرة */
+        #slide8 .intro-box-yellow {
+            font-size: 2.5em; 
+            background-color: var(--secondary-bg-color); /* خلفية سوداء */
+            color: var(--text-color-light); /* خط أبيض */
+            border: 2px solid var(--text-color-light); /* إطار أبيض 2 بكسل */
+            border-radius: 10px; /* انحناء 10 بكسل */
+            box-shadow: none;
+            width: 850px;
+            padding: 50px;
+        }
+        #slide8 .intro-box-yellow-wrapper {
+             top: 400px; /* موضع ثابت ليتوسط الشاشة */
+        }
+        #slide8 .thanks-text {
+             position: absolute;
+             bottom: 300px; /* موضع ثابت للأسفل */
+             font-size: 2.5em;
+             color: var(--text-color-light); /* لون أبيض على الخلفية السوداء */
+        }
+
+        .content-blocks-container {
+            width: 100%;
+            position: absolute;
+            top: 700px; /* تبدأ عند 700 بكسل من أعلى الصفحة */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content-block-black {
+            width: var(--content-width); /* نفس عرض المربع الأصفر */
+            background-color: var(--secondary-bg-color); 
+            color: var(--text-color-light); 
+            padding: 25px 30px;
+            border-radius: 10px; /* حواف منحنية 10 بيكسل */
+            font-size: 1.6em;
+            text-align: right;
+            margin-bottom: 30px; /* مسافة موحدة بين المربعات السوداء */
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .content-block-black .icon-small {
+            font-size: 1.8em;
+            color: var(--highlight-color);
+            margin-left: 20px;
+        }
+        
+        /* تنسيقات الأزرار */
+        .nav-button {
+            position: absolute; 
+            bottom: 50px;
+            padding: 20px 60px;
+            font-size: 1.8em;
+            font-family: var(--font-family);
+            background-color: var(--highlight-color);
+            color: var(--text-color-dark); /* لون الخط في الأزرار أصبح أسود */
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        .nav-button:hover {
+            background-color: #E6B837;
+        }
+        
+        #prevButton {
+            right: 50px;
+        }
+        #nextButton {
+            left: 50px;
+        }
+
+        /* تنسيقات خاصة لتعديل مواضع الـ content-blocks-container للشرائح المختلفة */
+        #slide3 .content-blocks-container {
+             top: 650px; 
+        }
+        #slide4 .content-blocks-container {
+             top: 600px; 
+        }
+        #slide5 .content-blocks-container {
+             top: 700px; 
+        }
+        #slide6 .content-blocks-container {
+             top: 700px;
+        }
+        #slide7 .content-blocks-container {
+             top: 600px;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+        
+        <section class="slide active" id="slide1">
+            <div class="top-image-container">
+                <img src="photo.png" alt="صورة معبرة عن التعاون">
+            </div>
+            <div class="logo-container">
+                <img src="YOU-Logo.png" alt="شعار الشركة">
+            </div>
+            <h1 class="main-title">أهمية التواصل الداخلي في الشركات</h1>
+            <div class="subtitle-box">إعداد فريق التواصل في الشركة</div>
+        </section>
+
+        <section class="slide" id="slide2">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>مقدمة: التواصل... الركيزة غير المرئية</h2>
+                </div>
+            </div>
+            
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    التواصل الداخلي هو عملية تبادل المعلومات والأفكار بين جميع الأفراد والمستويات داخل المنظمة، بهدف ضمان التناغم وتحقيق الأهداف المشتركة.
+                </div>
+            </div>
+            
+            <div class="content-blocks-container">
+                <div class="content-block-black">
+                    <span class="icon-small">🧭</span> <span>الوضوح الاستراتيجي: لفهم الجميع للرؤية والرسالة.</span>
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">💖</span> <span>بيئة عمل صحية: لتعزيز الثقة والانتماء.</span>
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">🤝</span> <span>التنسيق الفعّال: لربط الأقسام وتيسير العمليات.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide3">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>فن التواصل: المهارات الأساسية للفعالية</h2>
+                </div>
+            </div>
+            
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    تحديد المهارات: التواصل الفعال هو مزيج من القدرات اللفظية، السمعية، والبصرية التي تدعم تبادل الرسائل بدقة.
+                </div>
+            </div>
+
+            <div class="content-blocks-container">
+                <div class="content-block-black">
+                    <span class="icon-small">👂</span> <span>الاستماع النشط: التركيز الكامل لفهم الطرف الآخر.</span>
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">✍️</span> <span>الوضوح والإيجاز: الابتعاد عن التعقيد والغموض.</span>
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">💎</span> <span>الشفافية والصدق: بناء الثقة عبر مشاركة الحقائق.</span>
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">🔁</span> <span>التغذية الراجعة: تشجيع الحوار ثنائي الاتجاه.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide4">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>التواصل الداخلي: مفهوم وتطبيقات عملية</h2>
+                </div>
+            </div>
+
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    التطبيق العملي: يشمل كل ما يتعلق بتبادل المعلومات الرسمية وغير الرسمية، من رسائل البريد الإلكتروني إلى الاجتماعات ومؤتمرات الفيديو.
+                </div>
+            </div>
+
+            <div class="content-blocks-container">
+                <h3 style="margin-bottom: 20px; font-size: 2.2em; color: var(--text-color-dark);">اتجاهات التواصل:</h3>
+                <div class="content-block-black">
+                    <span class="icon-small">⬇️</span> تنازلي: توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">⬆️</span> تصاعدي: نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">↔️</span> أفقي: التنسيق والتعاون بين الزملاء والإدارات المختلفة.
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide5">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>فوائد التواصل الداخلي: العائد على المنظمة</h2>
+                </div>
+            </div>
+            
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    التواصل الجيد يحول الأفراد إلى فرق عمل متماسكة تدفع عجلة الإنتاجية والولاء.
+                </div>
+            </div>
+            
+            <div class="content-blocks-container">
+                <div class="content-block-black">
+                    <span class="icon-small">⚙️</span> زيادة الإنتاجية: وضوح المهام يقلل الأخطاء ويحسن الكفاءة.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">💡</span> دعم الابتكار: تشجيع الموظفين على طرح الأفكار والمبادرات الجديدة.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">🛡️</span> تعزيز الولاء والاحتفاظ: الموظفون المسموعون يستمرون لفترة أطول وأكثر ولاءً.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">🚨</span> إدارة الأزمات ببراعة: تمرير التعليمات والمعلومات بسرعة ودقة أثناء الأزمات.
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide6">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>معوقات النجاح: تحديات يجب مواجهتها</h2>
+                </div>
+            </div>
+            
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    التحديات غالباً ما تكون مرتبطة بـ (كثرة المعلومات، قلة الأدوات، أو غياب الثقة).
+                </div>
+            </div>
+
+            <div class="content-blocks-container">
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
+                    <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
+                    <span style="font-size: 0.9em;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
+                </div>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
+                    <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
+                    <span style="font-size: 0.9em;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
+                </div>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
+                    <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">😟</span> الخوف من النقد:</span>
+                    <span style="font-size: 0.9em;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide" id="slide7">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>التوصيات: بناء استراتيجية تواصل فعالة</h2>
+                </div>
+            </div>
+
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    يتطلب النجاح خطة منهجية تدمج الأدوات الرقمية مع الممارسات البشرية القيادية.
+                </div>
+            </div>
+
+            <div class="content-blocks-container">
+                <div class="content-block-black">
+                    <span class="icon-small">👨‍💼</span> تدريب القيادات: ليكونوا قدوة في التواصل المفتوح والشفاف.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">📱</span> تنويع القنوات: مزج بين الأدوات الرقمية واللقاءات الشخصية لتلبية احتياجات الجميع.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">🗣️</span> تفعيل "سفراء التواصل": لضمان تدفق المعلومات بشكل ثنائي الاتجاه بين الفرق المختلفة.
+                </div>
+                <div class="content-block-black">
+                    <span class="icon-small">📊</span> الاستماع الدائم: استخدام استطلاعات الرأي لقياس فعالية استراتيجية التواصل وتحسينها.
+                </div>
+            </div>
+            
+            <div class="icon-large" style="position: absolute; bottom: 180px;">🎯</div>
+        </section>
+
+        <section class="slide" id="slide8">
+            <div class="slide-header-wrapper">
+                <div class="slide-header">
+                    <h2>الخاتمة: قوة الاتصال... قوة شركتك</h2>
+                </div>
+            </div>
+            
+            <div class="intro-box-yellow-wrapper">
+                <div class="intro-box-yellow">
+                    التواصل الداخلي ليس مجرد وظيفة، بل هو عقلية مؤسسية. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.**
+                </div>
+            </div>
+            
+            <div class="thanks-text">
+                شكراً لوقتك الثمين
+            </div>
+            <div class="icon-large" style="position: absolute; bottom: 180px; color: var(--text-color-light);">👋</div>
+        </section>
+
+        
+        <button id="prevButton" class="nav-button" onclick="changeSlide(-1)">السابق</button>
+        <button id="nextButton" class="nav-button" onclick="changeSlide(1)">التالي</button>
+
+    </div> 
+    
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+            updateNavButtons(index);
+        }
+
+        function updateNavButtons(index) {
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+
+            if (index === 0) {
+                prevButton.style.display = 'none';
+                nextButton.style.display = 'block';
+            } 
+            else if (index === slides.length - 1) {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'none';
+            } 
+            else {
+                prevButton.style.display = 'block';
+                nextButton.style.display = 'block';
+            }
+        }
+
+        function changeSlide(direction) {
+            const newSlideIndex = currentSlide + direction;
+            if (newSlideIndex < 0 || newSlideIndex >= slides.length) {
+                return; 
+            }
+            currentSlide = newSlideIndex;
+            showSlide(currentSlide);
+        }
+
+        window.onload = () => showSlide(currentSlide);
+    </script>
+
+</body>
+</html>
