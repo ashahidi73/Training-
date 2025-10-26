@@ -47,18 +47,22 @@
             position: absolute;
             top: 0;
             left: 0;
+            /* التعديل الرئيسي: استخدام Flexbox لتجنب التداخل */
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            /* توزيع المحتوى: بداية الشريط العلوي ثم مساحة بينية ثم الكتل الأخرى */
+            justify-content: flex-start; 
             align-items: center;
             text-align: center;
-            padding-top: 0;
+            padding: 0; /* تم إزالة padding-top: 0; */
             box-sizing: border-box;
             background-color: var(--primary-bg-color);
             color: var(--text-color-dark);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease-in-out;
+            overflow-y: auto; /* للسماح بالتمرير إذا تجاوز المحتوى الارتفاع */
+            padding-bottom: calc(150 / var(--unit-ratio) * 1vmin); /* مساحة للأزرار */
         }
 
         .slide.active {
@@ -70,10 +74,14 @@
         
         .slide-header-wrapper {
             width: 100%;
-            top: calc(30 / var(--unit-ratio) * 1vmin); 
+            /* إلغاء التموضع المطلق وتثبيت المساحة العلوية */
+            margin-top: calc(30 / var(--unit-ratio) * 1vmin); 
             display: flex;
             justify-content: center;
             z-index: 10;
+            /* إضافة مسافة فاصلة بين الشريط الأصفر */
+            margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
+            flex-shrink: 0; /* لمنع الشريط العلوي من التقلص */
         }
         .slide-header {
             width: 100%;
@@ -83,7 +91,7 @@
             box-sizing: border-box;
         }
         .slide-header h2 {
-            /* تم التعديل إلى 70px */
+            /* حجم الخط: 70px */
             font-size: calc(70 / var(--unit-ratio) * 1vmin); 
             margin: 0;
             color: var(--highlight-color); 
@@ -92,6 +100,7 @@
         /* تعديل خاص للشريحة الأخيرة */
         #slide8 {
             background-color: var(--secondary-bg-color); 
+            justify-content: space-between; /* توزيع العناصر في الشريحة الأخيرة */
         }
         #slide8 .slide-header {
             background-color: var(--highlight-color); 
@@ -99,19 +108,40 @@
         #slide8 .slide-header h2 {
             color: var(--text-color-dark); 
         }
+        #slide8 .intro-box-yellow-wrapper {
+             /* تم إلغاء top: absolute */
+             margin-top: calc(100 / var(--unit-ratio) * 1vmin); /* مسافة من الشريط العلوي */
+        }
+        #slide8 .thanks-text {
+             /* تم إلغاء absolute position */
+             font-size: calc(60 / var(--unit-ratio) * 1vmin);
+             color: var(--text-color-light); 
+             flex-shrink: 0; 
+             margin-bottom: calc(50 / var(--unit-ratio) * 1vmin);
+        }
+        #slide8 .icon-large {
+             /* تم إلغاء absolute position */
+             color: var(--text-color-light);
+             margin-bottom: calc(50 / var(--unit-ratio) * 1vmin);
+        }
 
 
         /* تنسيق الصفحة الأولى */
         #slide1 {
             background-color: var(--secondary-bg-color);
             color: var(--text-color-light);
+            /* ترتيب العناصر عمودياً */
             justify-content: flex-start;
             padding: 0; 
+            /* لإلغاء الحاجة لـ slide-header-wrapper */
+            padding-bottom: calc(150 / var(--unit-ratio) * 1vmin); /* مساحة للأزرار */
+
         }
         #slide1 .top-image-container {
             width: 100%;
             height: calc(640 / var(--unit-ratio) * 1vmin); 
             overflow: hidden;
+            flex-shrink: 0;
         }
         #slide1 .top-image-container img {
             width: 100%;
@@ -121,37 +151,42 @@
         #slide1 .logo-container {
             margin-top: calc(60 / var(--unit-ratio) * 1vmin); 
             height: calc(150 / var(--unit-ratio) * 1vmin); 
+            flex-shrink: 0;
         }
         #slide1 .logo-container img {
             max-width: calc(300 / var(--unit-ratio) * 1vmin); 
             max-height: 100%;
         }
         #slide1 .main-title {
-            /* تم التعديل إلى 100px */
+            /* حجم الخط: 100px */
             font-size: calc(100 / var(--unit-ratio) * 1vmin); 
             margin-top: calc(80 / var(--unit-ratio) * 1vmin); 
             padding: 0 calc(50 / var(--unit-ratio) * 1vmin); 
             color: var(--text-color-light);
             line-height: 1.3;
+            flex-shrink: 0;
         }
         #slide1 .subtitle-box {
             background-color: var(--highlight-color);
             color: var(--text-color-dark);
             padding: calc(30 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
             border-radius: calc(10 / var(--unit-ratio) * 1vmin); 
-            /* ترك هذا الخط على 40px لضمان التناسب في النص الأصغر */
             font-size: calc(40 / var(--unit-ratio) * 1vmin); 
             font-weight: bold;
             margin-top: calc(150 / var(--unit-ratio) * 1vmin); 
+            flex-shrink: 0;
         }
 
         /* أنماط المحتوى لجميع الشرائح عدا الأولى */
         .intro-box-yellow-wrapper {
             width: 100%;
-            position: absolute;
-            top: calc(150 / var(--unit-ratio) * 1vmin); 
+            /* إلغاء absolute position */
+            /* position: absolute; top: ... */
             display: flex;
             justify-content: center;
+            /* إضافة مسافة علوية بدلاً من التموضع المطلق */
+            margin-top: calc(20 / var(--unit-ratio) * 1vmin); 
+            margin-bottom: calc(40 / var(--unit-ratio) * 1vmin);
         }
         .intro-box-yellow {
             width: calc(920 / var(--unit-ratio) * 1vmin); 
@@ -159,7 +194,6 @@
             color: var(--text-color-dark);
             padding: calc(30 / var(--unit-ratio) * 1vmin); 
             border-radius: calc(15 / var(--unit-ratio) * 1vmin); 
-            margin-top: calc(40 / var(--unit-ratio) * 1vmin); 
             /* تم التعديل إلى 70px */
             font-size: calc(70 / var(--unit-ratio) * 1vmin); 
             font-weight: bold;
@@ -169,7 +203,7 @@
         
         /* تعديل المربع الأصفر في الشريحة الأخيرة */
         #slide8 .intro-box-yellow {
-            /* تم تعديل هذا الخط ليتبع قيمة 70، وتم تعديل حجمه ليصبح 80 ليتناسب مع النهاية */
+            /* تم التعديل إلى 80px */
             font-size: calc(80 / var(--unit-ratio) * 1vmin); 
             background-color: var(--secondary-bg-color); 
             color: var(--text-color-light); 
@@ -179,24 +213,18 @@
             width: calc(850 / var(--unit-ratio) * 1vmin);
             padding: calc(50 / var(--unit-ratio) * 1vmin);
         }
-        #slide8 .intro-box-yellow-wrapper {
-             top: calc(400 / var(--unit-ratio) * 1vmin); 
-        }
-        #slide8 .thanks-text {
-             position: absolute;
-             bottom: calc(300 / var(--unit-ratio) * 1vmin); 
-             /* تم تعديل هذا الخط ليتناسب مع النهاية */
-             font-size: calc(60 / var(--unit-ratio) * 1vmin);
-             color: var(--text-color-light); 
-        }
+        
 
         .content-blocks-container {
             width: 100%;
-            position: absolute;
-            top: calc(700 / var(--unit-ratio) * 1vmin); 
+            /* إلغاء absolute position */
+            /* position: absolute; top: ... */
             display: flex;
             flex-direction: column;
             align-items: center;
+            /* مسافة علوية بدلاً من absolute top */
+            margin-top: calc(10 / var(--unit-ratio) * 1vmin);
+            margin-bottom: calc(10 / var(--unit-ratio) * 1vmin);
         }
 
         .content-block-black {
@@ -205,7 +233,7 @@
             color: var(--text-color-light); 
             padding: calc(25 / var(--unit-ratio) * 1vmin) calc(30 / var(--unit-ratio) * 1vmin);
             border-radius: calc(10 / var(--unit-ratio) * 1vmin); 
-            /* تم التعديل إلى 60px */
+            /* حجم الخط: 60px */
             font-size: calc(60 / var(--unit-ratio) * 1vmin); 
             font-weight: bold; 
             text-align: right;
@@ -213,9 +241,10 @@
             display: flex;
             align-items: center;
             box-shadow: 0 calc(4 / var(--unit-ratio) * 1vmin) calc(8 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
         .content-block-black .icon-small {
-            /* تم التعديل إلى 60px */
+            /* حجم الخط: 60px */
             font-size: calc(60 / var(--unit-ratio) * 1vmin);
             color: var(--highlight-color);
             margin-left: calc(20 / var(--unit-ratio) * 1vmin);
@@ -226,7 +255,7 @@
             position: absolute; 
             bottom: calc(50 / var(--unit-ratio) * 1vmin); 
             padding: calc(20 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
-            /* تم التعديل إلى 60px */
+            /* حجم الخط: 60px */
             font-size: calc(60 / var(--unit-ratio) * 1vmin);
             font-family: var(--font-family);
             background-color: var(--highlight-color);
@@ -246,40 +275,30 @@
             left: calc(50 / var(--unit-ratio) * 1vmin); 
         }
 
-        /* تنسيقات خاصة لتعديل مواضع الـ content-blocks-container للشرائح المختلفة */
-        /* تم تعديل التنسيقات لتعويض المساحة التي شغلها الخط الكبير */
-        #slide3 .content-blocks-container {
-             top: calc(750 / var(--unit-ratio) * 1vmin); 
-        }
-        #slide4 .content-blocks-container {
-             top: calc(700 / var(--unit-ratio) * 1vmin); 
-        }
-        #slide5 .content-blocks-container {
-             top: calc(750 / var(--unit-ratio) * 1vmin); 
-        }
-        #slide6 .content-blocks-container {
-             top: calc(750 / var(--unit-ratio) * 1vmin);
-        }
-        #slide7 .content-blocks-container {
-             top: calc(700 / var(--unit-ratio) * 1vmin); 
-        }
+        /* تم إلغاء التنسيقات الخاصة بالـ absolute position للـ content-blocks-container */
+        /* #slide3 .content-blocks-container { ... } */
+        /* #slide4 .content-blocks-container { ... } */
+        /* #slide5 .content-blocks-container { ... } */
+        /* #slide6 .content-blocks-container { ... } */
+        /* #slide7 .content-blocks-container { ... } */
 
         /* تنسيق الرمز الكبير في الشرائح الأخيرة */
         .icon-large {
-            /* تم تعديل هذا الخط ليتناسب مع النهاية */
+            /* تم إلغاء absolute position */
             font-size: calc(200 / var(--unit-ratio) * 1vmin); 
-            position: absolute; 
-            bottom: calc(180 / var(--unit-ratio) * 1vmin);
+            /* position: absolute; bottom: ... */
+            margin-bottom: calc(10 / var(--unit-ratio) * 1vmin); /* مسافة للأسفل */
+            margin-top: auto; /* لدفعها للأسفل قدر الإمكان في وضع Flexbox */
         }
 
         /* تعديل خاص لخطوط النصوص الداخلية في slide6 */
         #slide4 .content-blocks-container h3 {
              margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
-             /* تم تعديل هذا الخط ليتناسب مع الخط الكبير */
+             /* حجم الخط: 55px */
              font-size: calc(55 / var(--unit-ratio) * 1vmin); 
         }
         #slide6 .content-block-black span:nth-child(2) {
-            /* تم تعديل هذا الخط ليتناسب مع الخط الكبير */
+            /* حجم الخط: 35px */
             font-size: calc(35 / var(--unit-ratio) * 1vmin); 
         }
         #slide6 .content-block-black span:first-child {
@@ -490,7 +509,7 @@
             <div class="thanks-text">
                 نشكر لك وقتك الثمين
             </div>
-            <div class="icon-large" style="color: var(--text-color-light);">👋</div>
+            <div class="icon-large">👋</div>
         </section>
 
         
@@ -508,6 +527,8 @@
                 slide.classList.remove('active');
                 if (i === index) {
                     slide.classList.add('active');
+                    // إعادة التمرير للأعلى عند تغيير الشريحة
+                    slide.scrollTop = 0; 
                 }
             });
             updateNavButtons(index);
