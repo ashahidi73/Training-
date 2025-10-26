@@ -47,14 +47,13 @@
             position: absolute;
             top: 0;
             left: 0;
-            /* التعديل الرئيسي: استخدام Flexbox لتجنب التداخل */
+            /* استخدام Flexbox لتجنب التداخل */
             display: flex;
             flex-direction: column;
-            /* توزيع المحتوى: بداية الشريط العلوي ثم مساحة بينية ثم الكتل الأخرى */
             justify-content: flex-start; 
             align-items: center;
             text-align: center;
-            padding: 0; /* تم إزالة padding-top: 0; */
+            padding: 0; 
             box-sizing: border-box;
             background-color: var(--primary-bg-color);
             color: var(--text-color-dark);
@@ -62,26 +61,68 @@
             pointer-events: none;
             transition: opacity 0.5s ease-in-out;
             overflow-y: auto; /* للسماح بالتمرير إذا تجاوز المحتوى الارتفاع */
-            padding-bottom: calc(150 / var(--unit-ratio) * 1vmin); /* مساحة للأزرار */
+            /* زيادة المساحة السفلية لاستيعاب شريط الأزرار الثابت الجديد */
+            padding-bottom: calc(180 / var(--unit-ratio) * 1vmin); 
         }
 
         .slide.active {
             opacity: 1;
             pointer-events: auto;
         }
-
-        /* التنسيقات المتجاوبة للشريط العلوي والعناصر الأخرى */
         
+        /* ----------------------------------------------------------------- */
+        /* تنسيقات الأزرار الثابتة (Fixed Navigation) */
+        /* ----------------------------------------------------------------- */
+        .nav-controls {
+            position: fixed; /* تثبيت الموقع على الشاشة */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            /* ارتفاع ثابت للأزرار للحجز المساحة في الشريحة */
+            height: calc(150 / var(--unit-ratio) * 1vmin); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: calc(10 / var(--unit-ratio) * 1vmin) calc(50 / var(--unit-ratio) * 1vmin);
+            box-sizing: border-box;
+            background-color: var(--primary-bg-color); /* خلفية بيضاء */
+            z-index: 200; /* قيمة عالية لضمان ظهورها فوق كل شيء */
+            box-shadow: 0 calc(-5 / var(--unit-ratio) * 1vmin) calc(10 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.1);
+        }
+
+        .nav-button {
+            /* تم إلغاء التموضع المطلق (position: absolute) */
+            position: static; 
+            padding: calc(20 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
+            /* حجم الخط: 60px */
+            font-size: calc(60 / var(--unit-ratio) * 1vmin);
+            font-family: var(--font-family);
+            background-color: var(--highlight-color);
+            color: var(--text-color-dark); 
+            border: none;
+            border-radius: calc(15 / var(--unit-ratio) * 1vmin); 
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 calc(6 / var(--unit-ratio) * 1vmin) calc(12 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        /* إلغاء تنسيقات الـ absolute القديمة */
+        #prevButton { right: auto; }
+        #nextButton { left: auto; }
+        
+        /* ----------------------------------------------------------------- */
+        /* تنسيقات الشرائح ومحتواها */
+        /* ----------------------------------------------------------------- */
+
         .slide-header-wrapper {
             width: 100%;
-            /* إلغاء التموضع المطلق وتثبيت المساحة العلوية */
             margin-top: calc(30 / var(--unit-ratio) * 1vmin); 
             display: flex;
             justify-content: center;
             z-index: 10;
-            /* إضافة مسافة فاصلة بين الشريط الأصفر */
             margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
-            flex-shrink: 0; /* لمنع الشريط العلوي من التقلص */
+            flex-shrink: 0; 
         }
         .slide-header {
             width: 100%;
@@ -100,7 +141,7 @@
         /* تعديل خاص للشريحة الأخيرة */
         #slide8 {
             background-color: var(--secondary-bg-color); 
-            justify-content: space-between; /* توزيع العناصر في الشريحة الأخيرة */
+            justify-content: flex-start; /* استخدام flex-start للتوزيع من الأعلى */
         }
         #slide8 .slide-header {
             background-color: var(--highlight-color); 
@@ -109,18 +150,16 @@
             color: var(--text-color-dark); 
         }
         #slide8 .intro-box-yellow-wrapper {
-             /* تم إلغاء top: absolute */
-             margin-top: calc(100 / var(--unit-ratio) * 1vmin); /* مسافة من الشريط العلوي */
+             margin-top: calc(100 / var(--unit-ratio) * 1vmin); 
         }
         #slide8 .thanks-text {
-             /* تم إلغاء absolute position */
              font-size: calc(60 / var(--unit-ratio) * 1vmin);
              color: var(--text-color-light); 
              flex-shrink: 0; 
+             margin-top: calc(100 / var(--unit-ratio) * 1vmin); 
              margin-bottom: calc(50 / var(--unit-ratio) * 1vmin);
         }
         #slide8 .icon-large {
-             /* تم إلغاء absolute position */
              color: var(--text-color-light);
              margin-bottom: calc(50 / var(--unit-ratio) * 1vmin);
         }
@@ -130,12 +169,8 @@
         #slide1 {
             background-color: var(--secondary-bg-color);
             color: var(--text-color-light);
-            /* ترتيب العناصر عمودياً */
             justify-content: flex-start;
             padding: 0; 
-            /* لإلغاء الحاجة لـ slide-header-wrapper */
-            padding-bottom: calc(150 / var(--unit-ratio) * 1vmin); /* مساحة للأزرار */
-
         }
         #slide1 .top-image-container {
             width: 100%;
@@ -180,11 +215,8 @@
         /* أنماط المحتوى لجميع الشرائح عدا الأولى */
         .intro-box-yellow-wrapper {
             width: 100%;
-            /* إلغاء absolute position */
-            /* position: absolute; top: ... */
             display: flex;
             justify-content: center;
-            /* إضافة مسافة علوية بدلاً من التموضع المطلق */
             margin-top: calc(20 / var(--unit-ratio) * 1vmin); 
             margin-bottom: calc(40 / var(--unit-ratio) * 1vmin);
         }
@@ -194,7 +226,7 @@
             color: var(--text-color-dark);
             padding: calc(30 / var(--unit-ratio) * 1vmin); 
             border-radius: calc(15 / var(--unit-ratio) * 1vmin); 
-            /* تم التعديل إلى 70px */
+            /* حجم الخط: 70px */
             font-size: calc(70 / var(--unit-ratio) * 1vmin); 
             font-weight: bold;
             line-height: 1.5;
@@ -203,7 +235,7 @@
         
         /* تعديل المربع الأصفر في الشريحة الأخيرة */
         #slide8 .intro-box-yellow {
-            /* تم التعديل إلى 80px */
+            /* حجم الخط: 80px */
             font-size: calc(80 / var(--unit-ratio) * 1vmin); 
             background-color: var(--secondary-bg-color); 
             color: var(--text-color-light); 
@@ -217,12 +249,9 @@
 
         .content-blocks-container {
             width: 100%;
-            /* إلغاء absolute position */
-            /* position: absolute; top: ... */
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* مسافة علوية بدلاً من absolute top */
             margin-top: calc(10 / var(--unit-ratio) * 1vmin);
             margin-bottom: calc(10 / var(--unit-ratio) * 1vmin);
         }
@@ -250,45 +279,11 @@
             margin-left: calc(20 / var(--unit-ratio) * 1vmin);
         }
         
-        /* تنسيقات الأزرار */
-        .nav-button {
-            position: absolute; 
-            bottom: calc(50 / var(--unit-ratio) * 1vmin); 
-            padding: calc(20 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
-            /* حجم الخط: 60px */
-            font-size: calc(60 / var(--unit-ratio) * 1vmin);
-            font-family: var(--font-family);
-            background-color: var(--highlight-color);
-            color: var(--text-color-dark); 
-            border: none;
-            border-radius: calc(15 / var(--unit-ratio) * 1vmin); 
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 calc(6 / var(--unit-ratio) * 1vmin) calc(12 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.3);
-            z-index: 100;
-        }
-        
-        #prevButton {
-            right: calc(50 / var(--unit-ratio) * 1vmin); 
-        }
-        #nextButton {
-            left: calc(50 / var(--unit-ratio) * 1vmin); 
-        }
-
-        /* تم إلغاء التنسيقات الخاصة بالـ absolute position للـ content-blocks-container */
-        /* #slide3 .content-blocks-container { ... } */
-        /* #slide4 .content-blocks-container { ... } */
-        /* #slide5 .content-blocks-container { ... } */
-        /* #slide6 .content-blocks-container { ... } */
-        /* #slide7 .content-blocks-container { ... } */
-
         /* تنسيق الرمز الكبير في الشرائح الأخيرة */
         .icon-large {
-            /* تم إلغاء absolute position */
             font-size: calc(200 / var(--unit-ratio) * 1vmin); 
-            /* position: absolute; bottom: ... */
-            margin-bottom: calc(10 / var(--unit-ratio) * 1vmin); /* مسافة للأسفل */
-            margin-top: auto; /* لدفعها للأسفل قدر الإمكان في وضع Flexbox */
+            margin-bottom: calc(10 / var(--unit-ratio) * 1vmin);
+            margin-top: auto; 
         }
 
         /* تعديل خاص لخطوط النصوص الداخلية في slide6 */
@@ -511,12 +506,12 @@
             </div>
             <div class="icon-large">👋</div>
         </section>
-
-        
+    </div> 
+    
+    <div class="nav-controls">
         <button id="prevButton" class="nav-button" onclick="changeSlide(-1)">السابق</button>
         <button id="nextButton" class="nav-button" onclick="changeSlide(1)">التالي</button>
-
-    </div> 
+    </div>
     
     <script>
         const slides = document.querySelectorAll('.slide');
