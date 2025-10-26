@@ -17,7 +17,7 @@
             --design-width: 1080;
             --design-height: 1920; 
             --slide-padding-x: 80px; 
-            --content-width: calc(var(--design-width) * 1px - (var(--slide-padding-x) * 2));
+            --content-width: 920px; /* 1080 - 160 */
         }
 
         body {
@@ -113,7 +113,7 @@
         }
         #slide1 .top-image-container {
             width: 100%;
-            height: calc(1920px / 3); /* استخدام قيمة بكسل ثابتة للمحافظة على نسبة الصورة */
+            height: 640px; /* 1920 / 3 */
             overflow: hidden;
         }
         #slide1 .top-image-container img {
@@ -158,7 +158,7 @@
             justify-content: center;
         }
         .intro-box-yellow {
-            width: 920px; /* العرض الثابت 1080 - (80*2) = 920 بكسل */
+            width: var(--content-width); 
             background-color: var(--highlight-color); 
             color: var(--text-color-dark);
             padding: 30px;
@@ -201,13 +201,13 @@
         }
 
         .content-block-black {
-            width: 920px; /* نفس عرض المربع الأصفر */
+            width: var(--content-width); /* نفس عرض المربع الأصفر */
             background-color: var(--secondary-bg-color); 
             color: var(--text-color-light); 
             padding: 25px 30px;
             border-radius: 10px; /* حواف منحنية 10 بيكسل */
-            font-size: 1.8em; /* تم تكبير الخط */
-            font-weight: bold; /* تم جعله عريض */
+            font-size: 1.8em; 
+            font-weight: bold; 
             text-align: right;
             margin-bottom: 30px; /* مسافة موحدة بين المربعات السوداء */
             display: flex;
@@ -481,28 +481,28 @@
         const slides = document.querySelectorAll('.slide');
         const presentationContainer = document.querySelector('.presentation-container');
         let currentSlide = 0;
+        
+        const DESIGN_WIDTH = 1080;
+        const DESIGN_HEIGHT = 1920;
 
         // وظيفة جديدة لضبط مقياس (Scale) العرض ليتناسب مع نافذة المتصفح
         function adjustScale() {
-            const containerWidth = presentationContainer.offsetWidth;
-            const containerHeight = presentationContainer.offsetHeight;
-            
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
 
-            // نسبة التكبير/التصغير بناءً على العرض
-            const scaleX = windowWidth / containerWidth;
-            // نسبة التكبير/التصغير بناءً على الارتفاع
-            const scaleY = windowHeight / containerHeight;
+            // نحسب نسبة التكبير المطلوبة بناءً على العرض والارتفاع
+            const scaleX = windowWidth / DESIGN_WIDTH;
+            const scaleY = windowHeight / DESIGN_HEIGHT;
             
-            // نأخذ القيمة الأصغر لضمان أن الشريحة بالكامل تناسب الشاشة (لا يوجد تجاوز)
-            const scale = Math.min(scaleX, scaleY);
+            // نأخذ القيمة الأكبر (Math.max) لضمان أن الشريحة تملأ الشاشة
+            // (مبدأ Cover - قد يتم اقتصاص جزء بسيط من أحد الأبعاد)
+            const scale = Math.max(scaleX, scaleY);
 
             presentationContainer.style.transform = `scale(${scale})`;
             
-            // لضبط موقع الشريحة في المنتصف عند التصغير
-            const newWidth = containerWidth * scale;
-            const newHeight = containerHeight * scale;
+            // لضبط موقع الشريحة في المنتصف (لإخفاء الاقتصاص بالتساوي من الجانبين)
+            const newWidth = DESIGN_WIDTH * scale;
+            const newHeight = DESIGN_HEIGHT * scale;
             
             const offsetX = (windowWidth - newWidth) / 2;
             const offsetY = (windowHeight - newHeight) / 2;
