@@ -7,50 +7,52 @@
     <style>
         /* المتغيرات الأساسية والألوان */
         :root {
-            --primary-bg-color: #FFFFFF; /* خلفية معظم الصفحات (أبيض) */
-            --secondary-bg-color: #000000; /* خلفية الصفحة الأولى والشريط العلوي */
-            --highlight-color: #FFCC4E; /* الأصفر المطلوب */
+            --primary-bg-color: #FFFFFF;
+            --secondary-bg-color: #000000;
+            --highlight-color: #FFCC4E;
             --text-color-dark: #000000;
             --text-color-light: #FFFFFF;
             --font-family: 'Arial', sans-serif;
-            /* الأبعاد الأصلية التي صممنا عليها العرض (لأغراض القياس الداخلي فقط) */
-            --design-width: 1080;
-            --design-height: 1920; 
-            --slide-padding-x: 80px; 
-            --content-width: 920px; /* 1080 - 160 */
+            
+            /* تم تحويل جميع قياسات البكسل بناءً على عرض 1080px */
+            /* 1vw = 10.8px من التصميم الأصلي */
+            --vw-unit: 10.8; 
         }
 
+        /* دالة تحويل البكسل إلى vw: calc(Px / 10.8)vw */
+        
         body {
             font-family: var(--font-family);
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            /* تم تغيير الارتفاع ليتناسب مع حجم الشاشة */
+            height: 100vh; 
+            width: 100vw;
+            overflow-x: hidden; /* منع التمرير الأفقي */
+            background-color: #f0f0f0; 
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0; 
+            align-items: flex-start; /* بدء المحتوى من الأعلى */
         }
 
         .presentation-container {
-            /* تعيين الأبعاد الأصلية للعرض */
-            width: 1080px;
-            height: 1920px;
+            /* أصبح العرض 100% من عرض الشاشة */
+            width: 100vw; 
+            /* الارتفاع سيتبع المحتوى، لكنه في الواقع 100vh للملء المرئي */
+            height: 100vh;
             position: relative; 
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            /* منطق التجاوب الجديد */
-            transform-origin: top left;
+            overflow-y: auto; /* السماح بالتمرير الرأسي إذا لزم الأمر */
+            box-sizing: border-box;
+            box-shadow: 0 0 calc(1.38vw) rgba(0,0,0,0.5); /* 15px */
         }
 
-        /* JavaScript سيقوم بضبط حجم (Scale) هذا العنصر ليناسب الشاشة */
-
         .slide {
+            /* تم تحويل الأبعاد إلى وحدات العرض المتجاوبة */
+            width: 100vw;
+            height: 100vh;
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -70,11 +72,12 @@
             pointer-events: auto;
         }
 
-        /* تنسيق الشريط العلوي الجديد لجميع الشرائح عدا الأولى */
+        /* التنسيقات المتجاوبة للشريط العلوي والعناصر الأخرى */
+        
         .slide-header-wrapper {
             width: 100%;
             position: absolute;
-            top: 30px; 
+            top: calc(30 / var(--vw-unit) * 1vw); /* 30px */
             display: flex;
             justify-content: center;
             z-index: 10;
@@ -83,28 +86,28 @@
             width: 100%;
             background-color: var(--secondary-bg-color);
             color: var(--highlight-color);
-            padding: 30px 0;
+            padding: calc(30 / var(--vw-unit) * 1vw) 0; /* 30px */
             box-sizing: border-box;
         }
         .slide-header h2 {
-            font-size: 3em;
+            font-size: calc(3 / var(--vw-unit) * 100vw); /* 3em */
             margin: 0;
             color: var(--highlight-color); 
         }
         
         /* تعديل خاص للشريحة الأخيرة */
         #slide8 {
-            background-color: var(--secondary-bg-color); /* خلفية سوداء */
+            background-color: var(--secondary-bg-color); 
         }
         #slide8 .slide-header {
-            background-color: var(--highlight-color); /* شريط علوي أصفر */
+            background-color: var(--highlight-color); 
         }
         #slide8 .slide-header h2 {
-            color: var(--text-color-dark); /* عنوان أسود */
+            color: var(--text-color-dark); 
         }
 
 
-        /* تنسيق الصفحة الأولى (الخلفية سوداء) - تم الحفاظ عليه دون شريط علوي */
+        /* تنسيق الصفحة الأولى */
         #slide1 {
             background-color: var(--secondary-bg-color);
             color: var(--text-color-light);
@@ -113,7 +116,7 @@
         }
         #slide1 .top-image-container {
             width: 100%;
-            height: 640px; /* 1920 / 3 */
+            height: calc(640 / var(--vw-unit) * 1vw); /* 640px */
             overflow: hidden;
         }
         #slide1 .top-image-container img {
@@ -122,146 +125,147 @@
             object-fit: cover;
         }
         #slide1 .logo-container {
-            margin-top: 60px;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin-top: calc(60 / var(--vw-unit) * 1vw); /* 60px */
+            height: calc(150 / var(--vw-unit) * 1vw); /* 150px */
         }
         #slide1 .logo-container img {
-            max-width: 300px;
+            max-width: calc(300 / var(--vw-unit) * 1vw); /* 300px */
             max-height: 100%;
         }
         #slide1 .main-title {
-            font-size: 3.5em;
-            margin-top: 80px;
-            padding: 0 50px;
+            font-size: calc(3.5 / var(--vw-unit) * 100vw); /* 3.5em */
+            margin-top: calc(80 / var(--vw-unit) * 1vw); /* 80px */
+            padding: 0 calc(50 / var(--vw-unit) * 1vw); /* 50px */
             color: var(--text-color-light);
             line-height: 1.3;
         }
         #slide1 .subtitle-box {
             background-color: var(--highlight-color);
             color: var(--text-color-dark);
-            padding: 30px 60px;
-            border-radius: 10px; 
-            font-size: 2em;
+            padding: calc(30 / var(--vw-unit) * 1vw) calc(60 / var(--vw-unit) * 1vw);
+            border-radius: calc(10 / var(--vw-unit) * 1vw); /* 10px */
+            font-size: calc(2 / var(--vw-unit) * 100vw); /* 2em */
             font-weight: bold;
-            margin-top: 150px;
+            margin-top: calc(150 / var(--vw-unit) * 1vw); /* 150px */
         }
 
         /* أنماط المحتوى لجميع الشرائح عدا الأولى */
         .intro-box-yellow-wrapper {
             width: 100%;
             position: absolute;
-            top: 150px; 
+            top: calc(150 / var(--vw-unit) * 1vw); /* 150px */
             display: flex;
             justify-content: center;
         }
         .intro-box-yellow {
-            width: var(--content-width); 
+            width: calc(920 / var(--vw-unit) * 1vw); /* 920px */
             background-color: var(--highlight-color); 
             color: var(--text-color-dark);
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 40px; 
-            font-size: 2.2em; 
+            padding: calc(30 / var(--vw-unit) * 1vw); /* 30px */
+            border-radius: calc(15 / var(--vw-unit) * 1vw); /* 15px */
+            margin-top: calc(40 / var(--vw-unit) * 1vw); /* 40px */
+            font-size: calc(2.2 / var(--vw-unit) * 100vw); /* 2.2em */
             font-weight: bold;
             line-height: 1.5;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 calc(4 / var(--vw-unit) * 1vw) calc(8 / var(--vw-unit) * 1vw) rgba(0,0,0,0.1);
         }
         
         /* تعديل المربع الأصفر في الشريحة الأخيرة */
         #slide8 .intro-box-yellow {
-            font-size: 2.5em; 
-            background-color: var(--secondary-bg-color); /* خلفية سوداء */
-            color: var(--text-color-light); /* خط أبيض */
-            border: 2px solid var(--text-color-light); /* إطار أبيض 2 بكسل */
-            border-radius: 10px; /* انحناء 10 بكسل */
+            font-size: calc(2.5 / var(--vw-unit) * 100vw); 
+            background-color: var(--secondary-bg-color); 
+            color: var(--text-color-light); 
+            border: calc(2 / var(--vw-unit) * 1vw) solid var(--text-color-light); /* 2px */
+            border-radius: calc(10 / var(--vw-unit) * 1vw); /* 10px */
             box-shadow: none;
-            width: 850px;
-            padding: 50px;
+            width: calc(850 / var(--vw-unit) * 1vw);
+            padding: calc(50 / var(--vw-unit) * 1vw);
         }
         #slide8 .intro-box-yellow-wrapper {
-             top: 400px; /* موضع ثابت ليتوسط الشاشة */
+             top: calc(400 / var(--vw-unit) * 1vw); /* 400px */
         }
         #slide8 .thanks-text {
              position: absolute;
-             bottom: 300px; /* موضع ثابت للأسفل */
-             font-size: 2.5em;
-             color: var(--text-color-light); /* لون أبيض على الخلفية السوداء */
+             bottom: calc(300 / var(--vw-unit) * 1vw); /* 300px */
+             font-size: calc(2.5 / var(--vw-unit) * 100vw);
+             color: var(--text-color-light); 
         }
 
         .content-blocks-container {
             width: 100%;
             position: absolute;
-            top: 700px; /* تبدأ عند 700 بكسل من أعلى الصفحة */
+            top: calc(700 / var(--vw-unit) * 1vw); /* 700px */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         .content-block-black {
-            width: var(--content-width); /* نفس عرض المربع الأصفر */
+            width: calc(920 / var(--vw-unit) * 1vw); /* 920px */
             background-color: var(--secondary-bg-color); 
             color: var(--text-color-light); 
-            padding: 25px 30px;
-            border-radius: 10px; /* حواف منحنية 10 بيكسل */
-            font-size: 1.8em; 
+            padding: calc(25 / var(--vw-unit) * 1vw) calc(30 / var(--vw-unit) * 1vw);
+            border-radius: calc(10 / var(--vw-unit) * 1vw); /* 10px */
+            font-size: calc(1.8 / var(--vw-unit) * 100vw); /* 1.8em */
             font-weight: bold; 
             text-align: right;
-            margin-bottom: 30px; /* مسافة موحدة بين المربعات السوداء */
+            margin-bottom: calc(30 / var(--vw-unit) * 1vw); /* 30px */
             display: flex;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 calc(4 / var(--vw-unit) * 1vw) calc(8 / var(--vw-unit) * 1vw) rgba(0,0,0,0.3);
         }
         .content-block-black .icon-small {
-            font-size: 1.8em;
+            font-size: calc(1.8 / var(--vw-unit) * 100vw);
             color: var(--highlight-color);
-            margin-left: 20px;
+            margin-left: calc(20 / var(--vw-unit) * 1vw);
         }
         
         /* تنسيقات الأزرار */
         .nav-button {
             position: absolute; 
-            bottom: 50px;
-            padding: 20px 60px;
-            font-size: 1.8em;
+            bottom: calc(50 / var(--vw-unit) * 1vw); /* 50px */
+            padding: calc(20 / var(--vw-unit) * 1vw) calc(60 / var(--vw-unit) * 1vw);
+            font-size: calc(1.8 / var(--vw-unit) * 100vw);
             font-family: var(--font-family);
             background-color: var(--highlight-color);
-            color: var(--text-color-dark); /* لون الخط في الأزرار أصبح أسود */
+            color: var(--text-color-dark); 
             border: none;
-            border-radius: 15px;
+            border-radius: calc(15 / var(--vw-unit) * 1vw); /* 15px */
             cursor: pointer;
             transition: background-color 0.3s ease;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 calc(6 / var(--vw-unit) * 1vw) calc(12 / var(--vw-unit) * 1vw) rgba(0,0,0,0.3);
             z-index: 100;
-        }
-        .nav-button:hover {
-            background-color: #E6B837;
         }
         
         #prevButton {
-            right: 50px;
+            right: calc(50 / var(--vw-unit) * 1vw); /* 50px */
         }
         #nextButton {
-            left: 50px;
+            left: calc(50 / var(--vw-unit) * 1vw); /* 50px */
         }
 
         /* تنسيقات خاصة لتعديل مواضع الـ content-blocks-container للشرائح المختلفة */
         #slide3 .content-blocks-container {
-             top: 650px; 
+             top: calc(650 / var(--vw-unit) * 1vw); 
         }
         #slide4 .content-blocks-container {
-             top: 600px; 
+             top: calc(600 / var(--vw-unit) * 1vw); 
         }
         #slide5 .content-blocks-container {
-             top: 700px; 
+             top: calc(700 / var(--vw-unit) * 1vw); 
         }
         #slide6 .content-blocks-container {
-             top: 700px;
+             top: calc(700 / var(--vw-unit) * 1vw);
         }
         #slide7 .content-blocks-container {
-             top: 600px;
+             top: calc(600 / var(--vw-unit) * 1vw); 
+        }
+
+        /* تنسيق الرمز الكبير في الشرائح الأخيرة */
+        .icon-large {
+            font-size: calc(10 / var(--vw-unit) * 100vw); /* لرمز كبير جدًا */
+            position: absolute; 
+            bottom: calc(180 / var(--vw-unit) * 1vw);
         }
         
     </style>
@@ -350,14 +354,14 @@
             </div>
 
             <div class="content-blocks-container">
-                <h3 style="margin-bottom: 20px; font-size: 2.2em; color: var(--text-color-dark);">اتجاهات التواصل:</h3>
-                <div class="content-block-black" style="font-weight: normal;">
+                <h3 style="margin-bottom: calc(20 / var(--vw-unit) * 1vw); font-size: calc(2.2 / var(--vw-unit) * 100vw); color: var(--text-color-dark);">اتجاهات التواصل:</h3>
+                <div class="content-block-black" style="font-weight: bold;">
                     <span class="icon-small">⬇️</span> **تنازلي:** توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
                 </div>
-                <div class="content-block-black" style="font-weight: normal;">
+                <div class="content-block-black" style="font-weight: bold;">
                     <span class="icon-small">⬆️</span> **تصاعدي:** نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
                 </div>
-                <div class="content-block-black" style="font-weight: normal;">
+                <div class="content-block-black" style="font-weight: bold;">
                     <span class="icon-small">↔️</span> **أفقي:** التنسيق والتعاون بين الزملاء والإدارات المختلفة.
                 </div>
             </div>
@@ -406,17 +410,17 @@
             </div>
 
             <div class="content-blocks-container">
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
-                    <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
-                    <span style="font-size: 0.9em; font-weight: normal;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%; font-weight: bold;">
+                    <span style="padding-left: calc(10 / var(--vw-unit) * 1vw);"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
+                    <span style="font-size: calc(0.9 / var(--vw-unit) * 100vw); font-weight: normal;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
                 </div>
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
-                    <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
-                    <span style="font-size: 0.9em; font-weight: normal;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%; font-weight: bold;">
+                    <span style="padding-left: calc(10 / var(--vw-unit) * 1vw);"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
+                    <span style="font-size: calc(0.9 / var(--vw-unit) * 100vw); font-weight: normal;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
                 </div>
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
-                    <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">😟</span> الخوف من النقد:</span>
-                    <span style="font-size: 0.9em; font-weight: normal;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%; font-weight: bold;">
+                    <span style="padding-left: calc(10 / var(--vw-unit) * 1vw);"><span class="icon-small">😟</span> الخوف من النقد:</span>
+                    <span style="font-size: calc(0.9 / var(--vw-unit) * 100vw); font-weight: normal;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
                 </div>
             </div>
         </section>
@@ -449,7 +453,7 @@
                 </div>
             </div>
             
-            <div class="icon-large" style="position: absolute; bottom: 180px;">🎯</div>
+            <div class="icon-large" style="position: absolute; bottom: calc(180 / var(--vw-unit) * 1vw);">🎯</div>
         </section>
 
         <section class="slide" id="slide8">
@@ -468,7 +472,7 @@
             <div class="thanks-text">
                 نشكر لك وقتك الثمين
             </div>
-            <div class="icon-large" style="position: absolute; bottom: 180px; color: var(--text-color-light);">👋</div>
+            <div class="icon-large" style="position: absolute; bottom: calc(180 / var(--vw-unit) * 1vw); color: var(--text-color-light);">👋</div>
         </section>
 
         
@@ -479,38 +483,10 @@
     
     <script>
         const slides = document.querySelectorAll('.slide');
-        const presentationContainer = document.querySelector('.presentation-container');
         let currentSlide = 0;
         
-        const DESIGN_WIDTH = 1080;
-        const DESIGN_HEIGHT = 1920;
-
-        // وظيفة جديدة لضبط مقياس (Scale) العرض ليتناسب مع نافذة المتصفح
-        function adjustScale() {
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-
-            // نحسب نسبة التكبير المطلوبة بناءً على العرض والارتفاع
-            const scaleX = windowWidth / DESIGN_WIDTH;
-            const scaleY = windowHeight / DESIGN_HEIGHT;
-            
-            // نأخذ القيمة الأكبر (Math.max) لضمان أن الشريحة تملأ الشاشة
-            // (مبدأ Cover - قد يتم اقتصاص جزء بسيط من أحد الأبعاد)
-            const scale = Math.max(scaleX, scaleY);
-
-            presentationContainer.style.transform = `scale(${scale})`;
-            
-            // لضبط موقع الشريحة في المنتصف (لإخفاء الاقتصاص بالتساوي من الجانبين)
-            const newWidth = DESIGN_WIDTH * scale;
-            const newHeight = DESIGN_HEIGHT * scale;
-            
-            const offsetX = (windowWidth - newWidth) / 2;
-            const offsetY = (windowHeight - newHeight) / 2;
-
-            presentationContainer.style.marginLeft = `${offsetX}px`;
-            presentationContainer.style.marginTop = `${offsetY}px`;
-        }
-
+        // إزالة وظيفة adjustScale لأننا نستخدم وحدات vw الآن
+        // window.onresize و window.onload لم تعد تستدعي adjustScale
 
         function showSlide(index) {
             slides.forEach((slide, i) => {
@@ -549,13 +525,8 @@
             showSlide(currentSlide);
         }
 
-        // تشغيل وظيفة الضبط عند تحميل الصفحة وتغيير حجم النافذة
-        window.onload = () => {
-            adjustScale();
-            showSlide(currentSlide);
-        };
-        window.onresize = adjustScale;
-
+        // عرض الشريحة الأولى عند تحميل الصفحة
+        window.onload = () => showSlide(currentSlide);
     </script>
 
 </body>
