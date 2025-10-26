@@ -5,28 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Internal Communication - أهمية التواصل الداخلي</title>
     <style>
-        /* المتغيرات الأساسية والألوان */
+        /* المتغيرات الأساسية */
         :root {
-            --primary-bg-color: #FFFFFF;
+            --primary-bg-color: #FFFFFF; 
             --secondary-bg-color: #000000;
-            --highlight-color: #FFCC4E;
+            --highlight-color: #FFCC4E; /* الأصفر */
             --text-color-dark: #000000;
             --text-color-light: #FFFFFF;
             --font-family: 'Arial', sans-serif;
-            
-            /* 🚀 القيمة الجديدة: 12.0 لتقليل الخطوط جميعها بشكل موحد وأقل حدة من السابق */
-            --unit-ratio: 12.0; 
+            --container-max-width: 800px; 
+            --slide-padding-x: 5%; 
         }
 
-        /* دالة تحويل البكسل إلى vmin: calc(Px / 12.0)vmin */
-        
+        /* ------------------ قاعدة حجم الخط الأساسي (REM) ------------------ */
+        /* الحجم الأساسي على الهواتف الصغيرة */
+        html {
+            font-size: 14px; 
+        }
+
+        /* تعديل حجم الخط الأساسي للهواتف الكبيرة/اللوحية */
+        @media (min-width: 480px) {
+            html {
+                font-size: 16px;
+            }
+        }
+        /* تعديل حجم الخط الأساسي لشاشات الكمبيوتر المكتبية */
+        @media (min-width: 800px) {
+            html {
+                font-size: 17px;
+            }
+        }
+
+        /* ------------------ التخطيط العام (Body & Container) ------------------ */
         body {
             font-family: var(--font-family);
             margin: 0;
             padding: 0;
-            height: 100vh; 
+            min-height: 100vh;
             width: 100vw;
-            overflow: hidden; 
+            overflow-x: hidden; 
             background-color: #f0f0f0; 
             display: flex;
             justify-content: center;
@@ -34,145 +51,63 @@
         }
 
         .presentation-container {
-            width: 100vw; 
+            width: 100%;
             height: 100vh;
+            max-width: var(--container-max-width); 
             position: relative; 
-            box-sizing: border-box;
-            box-shadow: 0 0 calc(15 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.5); 
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
 
         .slide {
-            width: 100vw;
+            width: 100%;
             height: 100vh;
             position: absolute;
             top: 0;
             left: 0;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; 
+            justify-content: flex-start;
             align-items: center;
             text-align: center;
-            padding: 0; 
             box-sizing: border-box;
             background-color: var(--primary-bg-color);
             color: var(--text-color-dark);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease-in-out;
-            overflow-y: auto; 
-            padding-bottom: calc(180 / var(--unit-ratio) * 1vmin); 
         }
 
         .slide.active {
             opacity: 1;
             pointer-events: auto;
         }
-        
-        /* ----------------------------------------------------------------- */
-        /* تنسيقات الأزرار الثابتة (Fixed Navigation) */
-        /* ----------------------------------------------------------------- */
-        .nav-controls {
-            position: fixed; 
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: calc(150 / var(--unit-ratio) * 1vmin); 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: calc(10 / var(--unit-ratio) * 1vmin) calc(50 / var(--unit-ratio) * 1vmin);
-            box-sizing: border-box;
-            background-color: var(--primary-bg-color); 
-            z-index: 200; 
-            box-shadow: 0 calc(-5 / var(--unit-ratio) * 1vmin) calc(10 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.1);
-        }
 
-        .nav-button {
-            /* حجم الخط: 50px */
-            position: static; 
-            padding: calc(20 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
-            font-size: calc(50 / var(--unit-ratio) * 1vmin);
-            font-family: var(--font-family);
-            background-color: var(--highlight-color);
-            color: var(--text-color-dark); 
-            border: none;
-            border-radius: calc(15 / var(--unit-ratio) * 1vmin); 
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 calc(6 / var(--unit-ratio) * 1vmin) calc(12 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.3);
-            z-index: 100;
-        }
-
-        #prevButton { right: auto; }
-        #nextButton { left: auto; }
-        
-        /* ----------------------------------------------------------------- */
-        /* تنسيقات الشرائح ومحتواها */
-        /* ----------------------------------------------------------------- */
-
-        .slide-header-wrapper {
-            width: 100%;
-            margin-top: calc(30 / var(--unit-ratio) * 1vmin); 
-            display: flex;
-            justify-content: center;
-            z-index: 10;
-            margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
-            flex-shrink: 0; 
-        }
+        /* ------------------ الشريط العلوي (Header) ------------------ */
         .slide-header {
             width: 100%;
             background-color: var(--secondary-bg-color);
             color: var(--highlight-color);
-            padding: calc(30 / var(--unit-ratio) * 1vmin) 0; 
+            padding: 1.5rem 0; /* padding ثابت */
+            margin-bottom: 0.5rem;
             box-sizing: border-box;
         }
         .slide-header h2 {
-            /* حجم الخط: 60px */
-            font-size: calc(60 / var(--unit-ratio) * 1vmin); 
+            font-size: 2.2rem; /* حجم خط ثابت */
             margin: 0;
             color: var(--highlight-color); 
         }
-        
-        /* تعديل خاص للشريحة الأخيرة */
-        #slide8 {
-            background-color: var(--secondary-bg-color); 
-            justify-content: flex-start; 
-        }
-        #slide8 .slide-header {
-            background-color: var(--highlight-color); 
-        }
-        #slide8 .slide-header h2 {
-            color: var(--text-color-dark); 
-        }
-        #slide8 .intro-box-yellow-wrapper {
-             margin-top: calc(100 / var(--unit-ratio) * 1vmin); 
-        }
-        #slide8 .thanks-text {
-             /* حجم الخط: 55px */
-             font-size: calc(55 / var(--unit-ratio) * 1vmin);
-             color: var(--text-color-light); 
-             flex-shrink: 0; 
-             margin-top: calc(100 / var(--unit-ratio) * 1vmin); 
-             margin-bottom: calc(50 / var(--unit-ratio) * 1vmin);
-        }
-        #slide8 .icon-large {
-             color: var(--text-color-light);
-             margin-bottom: calc(50 / var(--unit-ratio) * 1vmin);
-        }
 
-
-        /* تنسيق الصفحة الأولى */
+        /* ------------------ الشريحة الأولى (Slide 1) ------------------ */
         #slide1 {
             background-color: var(--secondary-bg-color);
             color: var(--text-color-light);
-            justify-content: flex-start;
-            padding: 0; 
+            padding-top: 0; 
         }
         #slide1 .top-image-container {
             width: 100%;
-            height: calc(640 / var(--unit-ratio) * 1vmin); 
+            height: 33vh; 
             overflow: hidden;
-            flex-shrink: 0;
         }
         #slide1 .top-image-container img {
             width: 100%;
@@ -180,123 +115,161 @@
             object-fit: cover;
         }
         #slide1 .logo-container {
-            margin-top: calc(60 / var(--unit-ratio) * 1vmin); 
-            height: calc(150 / var(--unit-ratio) * 1vmin); 
-            flex-shrink: 0;
+            margin-top: 2rem;
+            height: 5rem;
+            display: flex;
+            justify-content: center;
         }
         #slide1 .logo-container img {
-            max-width: calc(300 / var(--unit-ratio) * 1vmin); 
+            max-width: 50%;
             max-height: 100%;
         }
         #slide1 .main-title {
-            /* حجم الخط: 80px */
-            font-size: calc(80 / var(--unit-ratio) * 1vmin); 
-            margin-top: calc(80 / var(--unit-ratio) * 1vmin); 
-            padding: 0 calc(50 / var(--unit-ratio) * 1vmin); 
+            font-size: 3rem; /* حجم خط ثابت */
+            margin-top: 2.5rem;
+            padding: 0 5%;
             color: var(--text-color-light);
             line-height: 1.3;
-            flex-shrink: 0;
         }
         #slide1 .subtitle-box {
             background-color: var(--highlight-color);
             color: var(--text-color-dark);
-            padding: calc(30 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
-            border-radius: calc(10 / var(--unit-ratio) * 1vmin); 
-            font-size: calc(40 / var(--unit-ratio) * 1vmin); 
+            padding: 1rem 2rem;
+            border-radius: 0.5rem; 
+            font-size: 1.6rem; /* حجم خط ثابت */
             font-weight: bold;
-            margin-top: calc(150 / var(--unit-ratio) * 1vmin); 
-            flex-shrink: 0;
+            margin-top: 5rem;
         }
 
-        /* أنماط المحتوى لجميع الشرائح عدا الأولى */
-        .intro-box-yellow-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: calc(20 / var(--unit-ratio) * 1vmin); 
-            margin-bottom: calc(40 / var(--unit-ratio) * 1vmin);
-        }
+        /* ------------------ مربعات المحتوى (Content Blocks) ------------------ */
+
+        /* المربع الأصفر (Intro Box) */
         .intro-box-yellow {
-            width: calc(920 / var(--unit-ratio) * 1vmin); 
+            width: 90%;
             background-color: var(--highlight-color); 
             color: var(--text-color-dark);
-            padding: calc(30 / var(--unit-ratio) * 1vmin); 
-            border-radius: calc(15 / var(--unit-ratio) * 1vmin); 
-            /* حجم الخط: 50px */
-            font-size: calc(50 / var(--unit-ratio) * 1vmin); 
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 3rem; 
+            font-size: 1.35rem; /* حجم خط ثابت */
             font-weight: bold;
             line-height: 1.5;
-            box-shadow: 0 calc(4 / var(--unit-ratio) * 1vmin) calc(8 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* تعديل المربع الأصفر في الشريحة الأخيرة */
-        #slide8 .intro-box-yellow {
-            /* حجم الخط: 60px */
-            font-size: calc(60 / var(--unit-ratio) * 1vmin); 
-            background-color: var(--secondary-bg-color); 
-            color: var(--text-color-light); 
-            border: calc(2 / var(--unit-ratio) * 1vmin) solid var(--text-color-light); 
-            border-radius: calc(10 / var(--unit-ratio) * 1vmin); 
-            box-shadow: none;
-            width: calc(850 / var(--unit-ratio) * 1vmin);
-            padding: calc(50 / var(--unit-ratio) * 1vmin);
-        }
-        
-
+        /* حاوية المربعات السوداء */
         .content-blocks-container {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: calc(10 / var(--unit-ratio) * 1vmin);
-            margin-bottom: calc(10 / var(--unit-ratio) * 1vmin);
-        }
-
-        .content-block-black {
-            width: calc(920 / var(--unit-ratio) * 1vmin); 
-            background-color: var(--secondary-bg-color); 
-            color: var(--text-color-light); 
-            padding: calc(25 / var(--unit-ratio) * 1vmin) calc(30 / var(--unit-ratio) * 1vmin);
-            border-radius: calc(10 / var(--unit-ratio) * 1vmin); 
-            /* حجم الخط: 45px */
-            font-size: calc(45 / var(--unit-ratio) * 1vmin); 
-            font-weight: bold; 
-            text-align: right;
-            margin-bottom: calc(30 / var(--unit-ratio) * 1vmin); 
-            display: flex;
-            align-items: center;
-            box-shadow: 0 calc(4 / var(--unit-ratio) * 1vmin) calc(8 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.3);
-            flex-shrink: 0;
-        }
-        .content-block-black .icon-small {
-            /* حجم الخط: 45px */
-            font-size: calc(45 / var(--unit-ratio) * 1vmin);
-            color: var(--highlight-color);
-            margin-left: calc(20 / var(--unit-ratio) * 1vmin);
+            margin-top: 2rem; 
         }
         
-        /* تنسيق الرمز الكبير في الشرائح الأخيرة */
-        .icon-large {
-            /* حجم الخط: 150px */
-            font-size: calc(150 / var(--unit-ratio) * 1vmin); 
-            margin-bottom: calc(10 / var(--unit-ratio) * 1vmin);
-            margin-top: auto; 
+        /* المربعات السوداء */
+        .content-block-black {
+            width: 90%; 
+            background-color: var(--secondary-bg-color); 
+            color: var(--text-color-light); 
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.5rem; 
+            font-size: 1.1rem; /* حجم خط ثابت */
+            font-weight: bold; 
+            text-align: right;
+            margin-bottom: 1rem; 
+            display: flex;
+            align-items: center;
+            line-height: 1.4;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .content-block-black .icon-small {
+            font-size: 1.5rem; /* حجم الأيقونة بالنسبة لـ rem */
+            color: var(--highlight-color);
+            margin-left: 1rem;
+        }
+        
+        /* تعديلات خاصة للشريحة 6 */
+        #slide6 .content-block-black {
+            display: grid; 
+            grid-template-columns: 40% 60%;
+            text-align: right; 
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            font-weight: bold; 
+        }
+        #slide6 .content-block-black span:last-child {
+            font-size: 1rem; /* حجم خط فرعي ثابت */
+            font-weight: normal; 
+            padding-right: 0.5rem;
         }
 
-        /* تعديل خاص لخطوط النصوص الداخلية في slide4 و slide6 */
-        #slide4 .content-blocks-container h3 {
-             margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
-             /* حجم الخط: 40px */
-             font-size: calc(40 / var(--unit-ratio) * 1vmin); 
+
+        /* ------------------ الشريحة الأخيرة (Slide 8) ------------------ */
+        #slide8 {
+            background-color: var(--secondary-bg-color); 
+            justify-content: center; 
         }
-        /* 💡 تم إلغاء التنسيق الخاص للشريحة 6، لتأخذ قيمة .content-block-black القياسية */
-        /* #slide6 .content-block-black span:nth-child(2) {
-            font-size: calc(40 / var(--unit-ratio) * 1vmin); 
-        } */
-        #slide6 .content-block-black span:first-child {
-             /* 💡 يجب إزالة الخط الغامق في الشريحة 6 لمنع تضخمه */
-             font-weight: normal;
-             padding-left: calc(10 / var(--unit-ratio) * 1vmin);
+        #slide8 .slide-header {
+            position: absolute;
+            top: 0;
+            background-color: var(--highlight-color); 
+        }
+        #slide8 .slide-header h2 {
+            color: var(--text-color-dark); 
+        }
+        #slide8 .intro-box-yellow {
+            background-color: var(--secondary-bg-color); 
+            color: var(--text-color-light); 
+            border: 2px solid var(--text-color-light); 
+            border-radius: 0.75rem; 
+            width: 80%;
+            padding: 2rem;
+            margin-top: 5vh; 
+            font-size: 1.8rem; /* حجم خط ثابت */
+            text-align: center;
+        }
+        #slide8 .thanks-text {
+             position: absolute;
+             bottom: 10vh; 
+             font-size: 1.8rem;
+             color: var(--text-color-light); 
+        }
+        .icon-large {
+            font-size: 4rem;
+            position: absolute; 
+            bottom: 2vh;
+            color: var(--highlight-color);
+        }
+        #slide8 .icon-large {
+            color: var(--text-color-light);
+        }
+
+
+        /* ------------------ أزرار التنقل ------------------ */
+        .nav-button {
+            position: absolute; 
+            bottom: 3vh;
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            font-family: var(--font-family);
+            background-color: var(--highlight-color);
+            color: var(--text-color-dark); 
+            border: none;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        .nav-button:hover {
+            background-color: #E6B837;
+        }
+        
+        #prevButton {
+            right: 5%;
+        }
+        #nextButton {
+            left: 5%;
         }
         
     </style>
@@ -307,26 +280,22 @@
         
         <section class="slide active" id="slide1">
             <div class="top-image-container">
-                <img src="https://via.placeholder.com/1080x600?text=Top+Image" alt="صورة معبرة عن التعاون">
+                <img src="photo.jpg" alt="صورة معبرة عن التعاون">
             </div>
             <div class="logo-container">
-                <img src="https://via.placeholder.com/300x150?text=Company+Logo" alt="شعار الشركة">
+                <img src="YOU-Logo.png" alt="شعار الشركة">
             </div>
             <h1 class="main-title">أهمية التواصل الداخلي في الشركات</h1>
             <div class="subtitle-box">إعداد فريق التواصل في الشركة</div>
         </section>
 
         <section class="slide" id="slide2">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>مقدمة: التواصل... الركيزة غير المرئية</h2>
-                </div>
+            <div class="slide-header">
+                <h2>مقدمة: التواصل... الركيزة غير المرئية</h2>
             </div>
             
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    التواصل الداخلي هو عملية تبادل المعلومات والأفكار بين جميع الأفراد والمستويات داخل المنظمة، بهدف ضمان التناغم وتحقيق الأهداف المشتركة.
-                </div>
+            <div class="intro-box-yellow">
+                التواصل الداخلي هو عملية تبادل المعلومات والأفكار بين جميع الأفراد والمستويات داخل المنظمة، بهدف ضمان التناغم وتحقيق الأهداف المشتركة.
             </div>
             
             <div class="content-blocks-container">
@@ -343,16 +312,12 @@
         </section>
 
         <section class="slide" id="slide3">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>فن التواصل: المهارات الأساسية للفعالية</h2>
-                </div>
+            <div class="slide-header">
+                <h2>فن التواصل: المهارات الأساسية للفعالية</h2>
             </div>
             
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    تحديد المهارات: التواصل الفعال هو مزيج من القدرات اللفظية، السمعية، والبصرية التي تدعم تبادل الرسائل بدقة.
-                </div>
+            <div class="intro-box-yellow">
+                تحديد المهارات: التواصل الفعال هو مزيج من القدرات اللفظية، السمعية، والبصرية التي تدعم تبادل الرسائل بدقة.
             </div>
 
             <div class="content-blocks-container">
@@ -372,43 +337,35 @@
         </section>
 
         <section class="slide" id="slide4">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>التواصل الداخلي: مفهوم وتطبيقات عملية</h2>
-                </div>
+            <div class="slide-header">
+                <h2>التواصل الداخلي: مفهوم وتطبيقات عملية</h2>
             </div>
 
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    التطبيق العملي: يشمل كل ما يتعلق بتبادل المعلومات الرسمية وغير الرسمية، من رسائل البريد الإلكتروني إلى الاجتماعات ومؤتمرات الفيديو.
-                </div>
+            <div class="intro-box-yellow">
+                التطبيق العملي: يشمل كل ما يتعلق بتبادل المعلومات الرسمية وغير الرسمية، من رسائل البريد الإلكتروني إلى الاجتماعات ومؤتمرات الفيديو.
             </div>
 
             <div class="content-blocks-container">
-                <h3 style="color: var(--text-color-dark);">اتجاهات التواصل:</h3>
-                <div class="content-block-black" style="font-weight: bold;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.6rem; color: var(--text-color-dark);">اتجاهات التواصل:</h3>
+                <div class="content-block-black">
                     <span class="icon-small">⬇️</span> **تنازلي:** توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
                 </div>
-                <div class="content-block-black" style="font-weight: bold;">
+                <div class="content-block-black">
                     <span class="icon-small">⬆️</span> **تصاعدي:** نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
                 </div>
-                <div class="content-block-black" style="font-weight: bold;">
+                <div class="content-block-black">
                     <span class="icon-small">↔️</span> **أفقي:** التنسيق والتعاون بين الزملاء والإدارات المختلفة.
                 </div>
             </div>
         </section>
 
         <section class="slide" id="slide5">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>فوائد التواصل الداخلي: العائد على المنظمة</h2>
-                </div>
+            <div class="slide-header">
+                <h2>فوائد التواصل الداخلي: العائد على المنظمة</h2>
             </div>
             
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    التواصل الجيد يحول الأفراد إلى فرق عمل متماسكة تدفع عجلة الإنتاجية والولاء.
-                </div>
+            <div class="intro-box-yellow">
+                التواصل الجيد يحول الأفراد إلى فرق عمل متماسكة تدفع عجلة الإنتاجية والولاء.
             </div>
             
             <div class="content-blocks-container">
@@ -428,45 +385,34 @@
         </section>
 
         <section class="slide" id="slide6">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>معوقات النجاح: تحديات يجب مواجهتها</h2>
-                </div>
+            <div class="slide-header">
+                <h2>معوقات النجاح: تحديات يجب مواجهتها</h2>
             </div>
             
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    التحديات غالباً ما تكون مرتبطة بـ (كثرة المعلومات، قلة الأدوات، أو غياب الثقة).
-                </div>
+            <div class="intro-box-yellow">
+                التحديات غالباً ما تكون مرتبطة بـ (كثرة المعلومات، قلة الأدوات، أو غياب الثقة).
             </div>
 
             <div class="content-blocks-container">
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
-                    <span style="font-weight: bold; padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
-                    <span style="font-weight: normal;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
+                <div class="content-block-black">
+                    <span class="icon-small">✉️</span> تضخم المعلومات: <span style="font-weight: normal;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
                 </div>
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
-                    <span style="font-weight: bold; padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
-                    <span style="font-weight: normal;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
+                <div class="content-block-black">
+                    <span class="icon-small">❓</span> غياب أدوات موحدة: <span style="font-weight: normal;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
                 </div>
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
-                    <span style="font-weight: bold; padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">😟</span> الخوف من النقد:</span>
-                    <span style="font-weight: normal;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
+                <div class="content-block-black">
+                    <span class="icon-small">😟</span> الخوف من النقد: <span style="font-weight: normal;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
                 </div>
             </div>
         </section>
 
         <section class="slide" id="slide7">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>التوصيات: بناء استراتيجية تواصل فعالة</h2>
-                </div>
+            <div class="slide-header">
+                <h2>التوصيات: بناء استراتيجية تواصل فعالة</h2>
             </div>
 
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    يتطلب النجاح خطة منهجية تدمج الأدوات الرقمية مع الممارسات البشرية القيادية.
-                </div>
+            <div class="intro-box-yellow">
+                يتطلب النجاح خطة منهجية تدمج الأدوات الرقمية مع الممارسات البشرية القيادية.
             </div>
 
             <div class="content-blocks-container">
@@ -488,16 +434,12 @@
         </section>
 
         <section class="slide" id="slide8">
-            <div class="slide-header-wrapper">
-                <div class="slide-header">
-                    <h2>الخاتمة: قوة الاتصال... قوة شركتك</h2>
-                </div>
+            <div class="slide-header">
+                <h2>الخاتمة: قوة الاتصال... قوة شركتك</h2>
             </div>
             
-            <div class="intro-box-yellow-wrapper">
-                <div class="intro-box-yellow">
-                    التواصل الداخلي ليس مجرد وظيفة، بل هو **عقلية مؤسسية**. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.**
-                </div>
+            <div class="intro-box-yellow">
+                التواصل الداخلي ليس مجرد وظيفة، بل هو **عقلية مؤسسية**. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.**
             </div>
             
             <div class="thanks-text">
@@ -505,24 +447,22 @@
             </div>
             <div class="icon-large">👋</div>
         </section>
-    </div> 
-    
-    <div class="nav-controls">
+
+        
         <button id="prevButton" class="nav-button" onclick="changeSlide(-1)">السابق</button>
         <button id="nextButton" class="nav-button" onclick="changeSlide(1)">التالي</button>
-    </div>
+
+    </div> 
     
     <script>
         const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
-        
+
         function showSlide(index) {
             slides.forEach((slide, i) => {
                 slide.classList.remove('active');
                 if (i === index) {
                     slide.classList.add('active');
-                    // إعادة التمرير للأعلى عند تغيير الشريحة
-                    slide.scrollTop = 0; 
                 }
             });
             updateNavButtons(index);
@@ -555,7 +495,6 @@
             showSlide(currentSlide);
         }
 
-        // عرض الشريحة الأولى عند تحميل الصفحة
         window.onload = () => showSlide(currentSlide);
     </script>
 
