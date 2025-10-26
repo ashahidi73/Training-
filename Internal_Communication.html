@@ -14,11 +14,11 @@
             --text-color-light: #FFFFFF;
             --font-family: 'Arial', sans-serif;
             
-            /* معامل التحويل: القيمة الأصلية بالبكسل / 10.8 للحصول على قيمة VMIN */
-            --unit-ratio: 10.8; 
+            /* معامل التحويل: القيمة الأصلية بالبكسل / 14.0 للحصول على قيمة VMIN أصغر */
+            --unit-ratio: 14.0; 
         }
 
-        /* دالة تحويل البكسل إلى vmin: calc(Px / 10.8)vmin */
+        /* دالة تحويل البكسل إلى vmin: calc(Px / 14.0)vmin */
         
         body {
             font-family: var(--font-family);
@@ -47,7 +47,6 @@
             position: absolute;
             top: 0;
             left: 0;
-            /* استخدام Flexbox لتجنب التداخل */
             display: flex;
             flex-direction: column;
             justify-content: flex-start; 
@@ -60,8 +59,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease-in-out;
-            overflow-y: auto; /* للسماح بالتمرير إذا تجاوز المحتوى الارتفاع */
-            /* زيادة المساحة السفلية لاستيعاب شريط الأزرار الثابت الجديد */
+            overflow-y: auto; 
             padding-bottom: calc(180 / var(--unit-ratio) * 1vmin); 
         }
 
@@ -74,27 +72,25 @@
         /* تنسيقات الأزرار الثابتة (Fixed Navigation) */
         /* ----------------------------------------------------------------- */
         .nav-controls {
-            position: fixed; /* تثبيت الموقع على الشاشة */
+            position: fixed; 
             bottom: 0;
             left: 0;
             width: 100%;
-            /* ارتفاع ثابت للأزرار للحجز المساحة في الشريحة */
             height: calc(150 / var(--unit-ratio) * 1vmin); 
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: calc(10 / var(--unit-ratio) * 1vmin) calc(50 / var(--unit-ratio) * 1vmin);
             box-sizing: border-box;
-            background-color: var(--primary-bg-color); /* خلفية بيضاء */
-            z-index: 200; /* قيمة عالية لضمان ظهورها فوق كل شيء */
+            background-color: var(--primary-bg-color); 
+            z-index: 200; 
             box-shadow: 0 calc(-5 / var(--unit-ratio) * 1vmin) calc(10 / var(--unit-ratio) * 1vmin) rgba(0,0,0,0.1);
         }
 
         .nav-button {
-            /* تم إلغاء التموضع المطلق (position: absolute) */
+            /* حجم الخط: 50px */
             position: static; 
             padding: calc(20 / var(--unit-ratio) * 1vmin) calc(60 / var(--unit-ratio) * 1vmin);
-            /* حجم الخط: 50px */
             font-size: calc(50 / var(--unit-ratio) * 1vmin);
             font-family: var(--font-family);
             background-color: var(--highlight-color);
@@ -107,7 +103,6 @@
             z-index: 100;
         }
 
-        /* إلغاء تنسيقات الـ absolute القديمة */
         #prevButton { right: auto; }
         #nextButton { left: auto; }
         
@@ -141,7 +136,7 @@
         /* تعديل خاص للشريحة الأخيرة */
         #slide8 {
             background-color: var(--secondary-bg-color); 
-            justify-content: flex-start; /* استخدام flex-start للتوزيع من الأعلى */
+            justify-content: flex-start; 
         }
         #slide8 .slide-header {
             background-color: var(--highlight-color); 
@@ -153,7 +148,7 @@
              margin-top: calc(100 / var(--unit-ratio) * 1vmin); 
         }
         #slide8 .thanks-text {
-             /* حجم الخط: تم تعديل هذا الخط ليتناسب مع النهاية (أكبر قليلا) */
+             /* حجم الخط: 55px */
              font-size: calc(55 / var(--unit-ratio) * 1vmin);
              color: var(--text-color-light); 
              flex-shrink: 0; 
@@ -236,7 +231,7 @@
         
         /* تعديل المربع الأصفر في الشريحة الأخيرة */
         #slide8 .intro-box-yellow {
-            /* حجم الخط: تم تعديل هذا الخط ليتناسب مع النهاية (أكبر قليلا) */
+            /* حجم الخط: 60px */
             font-size: calc(60 / var(--unit-ratio) * 1vmin); 
             background-color: var(--secondary-bg-color); 
             color: var(--text-color-light); 
@@ -263,7 +258,7 @@
             color: var(--text-color-light); 
             padding: calc(25 / var(--unit-ratio) * 1vmin) calc(30 / var(--unit-ratio) * 1vmin);
             border-radius: calc(10 / var(--unit-ratio) * 1vmin); 
-            /* حجم الخط: 40px */
+            /* حجم الخط: 45px */
             font-size: calc(45 / var(--unit-ratio) * 1vmin); 
             font-weight: bold; 
             text-align: right;
@@ -274,7 +269,7 @@
             flex-shrink: 0;
         }
         .content-block-black .icon-small {
-            /* حجم الخط: 40px */
+            /* حجم الخط: 45px */
             font-size: calc(45 / var(--unit-ratio) * 1vmin);
             color: var(--highlight-color);
             margin-left: calc(20 / var(--unit-ratio) * 1vmin);
@@ -282,7 +277,7 @@
         
         /* تنسيق الرمز الكبير في الشرائح الأخيرة */
         .icon-large {
-            /* حجم الخط: تم تعديل هذا الخط ليتناسب مع النهاية (أصغر قليلا) */
+            /* حجم الخط: 150px */
             font-size: calc(150 / var(--unit-ratio) * 1vmin); 
             margin-bottom: calc(10 / var(--unit-ratio) * 1vmin);
             margin-top: auto; 
@@ -291,11 +286,11 @@
         /* تعديل خاص لخطوط النصوص الداخلية في slide6 */
         #slide4 .content-blocks-container h3 {
              margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
-            /* تم رفعه ليكون 40px بدلاً من 30px */
+             /* حجم الخط: 40px */
              font-size: calc(40 / var(--unit-ratio) * 1vmin); 
         }
         #slide6 .content-block-black span:nth-child(2) {
-            /* تم رفعه ليكون 40px بدلاً من 30px */
+            /* 💥 تم رفعه ليكون 40px بدلاً من 30px ليتناسب مع الخط الرئيسي */
             font-size: calc(40 / var(--unit-ratio) * 1vmin); 
         }
         #slide6 .content-block-black span:first-child {
@@ -390,13 +385,13 @@
             <div class="content-blocks-container">
                 <h3 style="color: var(--text-color-dark);">اتجاهات التواصل:</h3>
                 <div class="content-block-black" style="font-weight: bold;">
-                    <span class="icon-small">⬇️</span> تنازلي: توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
+                    <span class="icon-small">⬇️</span> **تنازلي:** توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
                 </div>
                 <div class="content-block-black" style="font-weight: bold;">
-                    <span class="icon-small">⬆️</span> تصاعدي: نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
+                    <span class="icon-small">⬆️</span> **تصاعدي:** نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
                 </div>
                 <div class="content-block-black" style="font-weight: bold;">
-                    <span class="icon-small">↔️</span> أفقي: التنسيق والتعاون بين الزملاء والإدارات المختلفة.
+                    <span class="icon-small">↔️</span> **أفقي:** التنسيق والتعاون بين الزملاء والإدارات المختلفة.
                 </div>
             </div>
         </section>
@@ -499,12 +494,12 @@
             
             <div class="intro-box-yellow-wrapper">
                 <div class="intro-box-yellow">
-                    التواصل الداخلي ليس مجرد وظيفة، بل هو عقلية مؤسسية. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.
+                    التواصل الداخلي ليس مجرد وظيفة، بل هو **عقلية مؤسسية**. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.**
                 </div>
             </div>
             
             <div class="thanks-text">
-                شكراً على وقتك الثمين
+                نشكر لك وقتك الثمين
             </div>
             <div class="icon-large">👋</div>
         </section>
@@ -564,4 +559,3 @@
 
 </body>
 </html>
-
