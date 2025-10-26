@@ -14,11 +14,11 @@
             --text-color-light: #FFFFFF;
             --font-family: 'Arial', sans-serif;
             
-            /* معامل التحويل: القيمة الأصلية بالبكسل / 14.0 للحصول على قيمة VMIN أصغر */
-            --unit-ratio: 14.0; 
+            /* 🚀 القيمة الجديدة: 12.0 لتقليل الخطوط جميعها بشكل موحد وأقل حدة من السابق */
+            --unit-ratio: 12.0; 
         }
 
-        /* دالة تحويل البكسل إلى vmin: calc(Px / 14.0)vmin */
+        /* دالة تحويل البكسل إلى vmin: calc(Px / 12.0)vmin */
         
         body {
             font-family: var(--font-family);
@@ -283,18 +283,20 @@
             margin-top: auto; 
         }
 
-        /* تعديل خاص لخطوط النصوص الداخلية في slide6 */
+        /* تعديل خاص لخطوط النصوص الداخلية في slide4 و slide6 */
         #slide4 .content-blocks-container h3 {
              margin-bottom: calc(20 / var(--unit-ratio) * 1vmin); 
              /* حجم الخط: 40px */
              font-size: calc(40 / var(--unit-ratio) * 1vmin); 
         }
-        #slide6 .content-block-black span:nth-child(2) {
-            /* 💥 تم رفعه ليكون 40px بدلاً من 30px ليتناسب مع الخط الرئيسي */
+        /* 💡 تم إلغاء التنسيق الخاص للشريحة 6، لتأخذ قيمة .content-block-black القياسية */
+        /* #slide6 .content-block-black span:nth-child(2) {
             font-size: calc(40 / var(--unit-ratio) * 1vmin); 
-        }
+        } */
         #slide6 .content-block-black span:first-child {
-            padding-left: calc(10 / var(--unit-ratio) * 1vmin);
+             /* 💡 يجب إزالة الخط الغامق في الشريحة 6 لمنع تضخمه */
+             font-weight: normal;
+             padding-left: calc(10 / var(--unit-ratio) * 1vmin);
         }
         
     </style>
@@ -439,16 +441,16 @@
             </div>
 
             <div class="content-blocks-container">
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%; font-weight: bold;">
-                    <span style="padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
+                    <span style="font-weight: bold; padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
                     <span style="font-weight: normal;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
                 </div>
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%; font-weight: bold;">
-                    <span style="padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
+                    <span style="font-weight: bold; padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
                     <span style="font-weight: normal;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
                 </div>
-                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%; font-weight: bold;">
-                    <span style="padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">😟</span> الخوف من النقد:</span>
+                <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
+                    <span style="font-weight: bold; padding-left: calc(10 / var(--unit-ratio) * 1vmin);"><span class="icon-small">😟</span> الخوف من النقد:</span>
                     <span style="font-weight: normal;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
                 </div>
             </div>
