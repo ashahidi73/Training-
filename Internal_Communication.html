@@ -13,11 +13,11 @@
             --text-color-dark: #000000;
             --text-color-light: #FFFFFF;
             --font-family: 'Arial', sans-serif;
-            /* حجم الشاشة: 1080 عرض، 1920 ارتفاع (Portrait) */
-            --slide-width: 1080px;
-            --slide-height: 1920px;
-            --slide-padding-x: 80px; /* مسافة داخلية موحدة للعرض */
-            --content-width: calc(var(--slide-width) - (var(--slide-padding-x) * 2));
+            /* الأبعاد الأصلية التي صممنا عليها العرض (لأغراض القياس الداخلي فقط) */
+            --design-width: 1080;
+            --design-height: 1920; 
+            --slide-padding-x: 80px; 
+            --content-width: calc(var(--design-width) * 1px - (var(--slide-padding-x) * 2));
         }
 
         body {
@@ -33,12 +33,17 @@
         }
 
         .presentation-container {
-            width: var(--slide-width);
-            height: var(--slide-height);
+            /* تعيين الأبعاد الأصلية للعرض */
+            width: 1080px;
+            height: 1920px;
             position: relative; 
             overflow: hidden;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            /* منطق التجاوب الجديد */
+            transform-origin: top left;
         }
+
+        /* JavaScript سيقوم بضبط حجم (Scale) هذا العنصر ليناسب الشاشة */
 
         .slide {
             position: absolute;
@@ -108,7 +113,7 @@
         }
         #slide1 .top-image-container {
             width: 100%;
-            height: calc(var(--slide-height) / 3); 
+            height: calc(1920px / 3); /* استخدام قيمة بكسل ثابتة للمحافظة على نسبة الصورة */
             overflow: hidden;
         }
         #slide1 .top-image-container img {
@@ -153,7 +158,7 @@
             justify-content: center;
         }
         .intro-box-yellow {
-            width: var(--content-width); 
+            width: 920px; /* العرض الثابت 1080 - (80*2) = 920 بكسل */
             background-color: var(--highlight-color); 
             color: var(--text-color-dark);
             padding: 30px;
@@ -196,12 +201,13 @@
         }
 
         .content-block-black {
-            width: var(--content-width); /* نفس عرض المربع الأصفر */
+            width: 920px; /* نفس عرض المربع الأصفر */
             background-color: var(--secondary-bg-color); 
             color: var(--text-color-light); 
             padding: 25px 30px;
             border-radius: 10px; /* حواف منحنية 10 بيكسل */
-            font-size: 1.6em;
+            font-size: 1.8em; /* تم تكبير الخط */
+            font-weight: bold; /* تم جعله عريض */
             text-align: right;
             margin-bottom: 30px; /* مسافة موحدة بين المربعات السوداء */
             display: flex;
@@ -266,7 +272,7 @@
         
         <section class="slide active" id="slide1">
             <div class="top-image-container">
-                <img src="photo.png" alt="صورة معبرة عن التعاون">
+                <img src="photo.jpg" alt="صورة معبرة عن التعاون">
             </div>
             <div class="logo-container">
                 <img src="YOU-Logo.png" alt="شعار الشركة">
@@ -345,14 +351,14 @@
 
             <div class="content-blocks-container">
                 <h3 style="margin-bottom: 20px; font-size: 2.2em; color: var(--text-color-dark);">اتجاهات التواصل:</h3>
-                <div class="content-block-black">
-                    <span class="icon-small">⬇️</span> تنازلي: توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
+                <div class="content-block-black" style="font-weight: normal;">
+                    <span class="icon-small">⬇️</span> **تنازلي:** توجيه الأهداف والسياسات من الإدارة العليا إلى الموظفين.
                 </div>
-                <div class="content-block-black">
-                    <span class="icon-small">⬆️</span> تصاعدي: نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
+                <div class="content-block-black" style="font-weight: normal;">
+                    <span class="icon-small">⬆️</span> **تصاعدي:** نقل الآراء والمقترحات والتقارير من الموظفين إلى الإدارة.
                 </div>
-                <div class="content-block-black">
-                    <span class="icon-small">↔️</span> أفقي: التنسيق والتعاون بين الزملاء والإدارات المختلفة.
+                <div class="content-block-black" style="font-weight: normal;">
+                    <span class="icon-small">↔️</span> **أفقي:** التنسيق والتعاون بين الزملاء والإدارات المختلفة.
                 </div>
             </div>
         </section>
@@ -402,15 +408,15 @@
             <div class="content-blocks-container">
                 <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
                     <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">✉️</span> تضخم المعلومات:</span>
-                    <span style="font-size: 0.9em;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
+                    <span style="font-size: 0.9em; font-weight: normal;">التصفية والتخصيص: توجيه الرسائل للجمهور المعني فقط.</span>
                 </div>
                 <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
                     <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">❓</span> غياب أدوات موحدة:</span>
-                    <span style="font-size: 0.9em;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
+                    <span style="font-size: 0.9em; font-weight: normal;">منصة مركزية: توفير بوابة معلومات داخلية موحدة وسهلة الاستخدام.</span>
                 </div>
                 <div class="content-block-black" style="display: grid; grid-template-columns: 40% 60%;">
                     <span style="font-weight: bold; padding-left: 10px;"><span class="icon-small">😟</span> الخوف من النقد:</span>
-                    <span style="font-size: 0.9em;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
+                    <span style="font-size: 0.9em; font-weight: normal;">ضمان السرية والإنصاف: خلق بيئة آمنة للتغذية الراجعة الصادقة.</span>
                 </div>
             </div>
         </section>
@@ -455,12 +461,12 @@
             
             <div class="intro-box-yellow-wrapper">
                 <div class="intro-box-yellow">
-                    التواصل الداخلي ليس مجرد وظيفة، بل هو عقلية مؤسسية. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.**
+                    التواصل الداخلي ليس مجرد وظيفة، بل هو **عقلية مؤسسية**. عندما يتواصل الناس بفاعلية، فإنهم يعملون بانسجام، ويبتكرون بشغف، وينمون بثبات. **استثمر في تواصلك الداخلي، لتحصد النجاح المستدام.**
                 </div>
             </div>
             
             <div class="thanks-text">
-                شكراً لوقتك الثمين
+                نشكر لك وقتك الثمين
             </div>
             <div class="icon-large" style="position: absolute; bottom: 180px; color: var(--text-color-light);">👋</div>
         </section>
@@ -473,7 +479,38 @@
     
     <script>
         const slides = document.querySelectorAll('.slide');
+        const presentationContainer = document.querySelector('.presentation-container');
         let currentSlide = 0;
+
+        // وظيفة جديدة لضبط مقياس (Scale) العرض ليتناسب مع نافذة المتصفح
+        function adjustScale() {
+            const containerWidth = presentationContainer.offsetWidth;
+            const containerHeight = presentationContainer.offsetHeight;
+            
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // نسبة التكبير/التصغير بناءً على العرض
+            const scaleX = windowWidth / containerWidth;
+            // نسبة التكبير/التصغير بناءً على الارتفاع
+            const scaleY = windowHeight / containerHeight;
+            
+            // نأخذ القيمة الأصغر لضمان أن الشريحة بالكامل تناسب الشاشة (لا يوجد تجاوز)
+            const scale = Math.min(scaleX, scaleY);
+
+            presentationContainer.style.transform = `scale(${scale})`;
+            
+            // لضبط موقع الشريحة في المنتصف عند التصغير
+            const newWidth = containerWidth * scale;
+            const newHeight = containerHeight * scale;
+            
+            const offsetX = (windowWidth - newWidth) / 2;
+            const offsetY = (windowHeight - newHeight) / 2;
+
+            presentationContainer.style.marginLeft = `${offsetX}px`;
+            presentationContainer.style.marginTop = `${offsetY}px`;
+        }
+
 
         function showSlide(index) {
             slides.forEach((slide, i) => {
@@ -512,7 +549,13 @@
             showSlide(currentSlide);
         }
 
-        window.onload = () => showSlide(currentSlide);
+        // تشغيل وظيفة الضبط عند تحميل الصفحة وتغيير حجم النافذة
+        window.onload = () => {
+            adjustScale();
+            showSlide(currentSlide);
+        };
+        window.onresize = adjustScale;
+
     </script>
 
 </body>
