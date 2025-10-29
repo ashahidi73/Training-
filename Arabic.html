@@ -68,7 +68,7 @@
 
 <body>
 
-    <!-- تم تغيير bg-white إلى bg-[#ffcc4e] -->
+    <!-- الوعاء الرئيسي بنفس لون الخلفية -->
     <div id="app" class="w-full max-w-lg p-6 md:p-10 shadow-2xl bg-[#ffcc4e] rounded-xl">
         <!-- سيتم تحميل المحتوى هنا (شاشة البدء، المسابقة، النتائج) -->
     </div>
@@ -99,29 +99,17 @@
         // تهيئة Tone.js للأصوات
         let correctSynth, incorrectSynth;
         
-        // وظيفة لتحويل Base64 إلى ArrayBuffer (غير مستخدمة الآن لكن تم الاحتفاظ بها كملاحظة)
-        function base64ToArrayBuffer(base64) {
-            const binaryString = atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
-        
         // وظيفة لتشغيل الصوت بناءً على نوعه (صحيح أو خاطئ)
         async function playFeedbackSound(isCorrect) {
             try {
-                // يجب أولاً أن يبدأ المستخدم التفاعل، لذا نتأكد من بدء Tone.js
+                // يجب أولاً أن يبدأ المستخدم التفاعل
                 await Tone.start();
 
-                // في حال عدم تهيئة الأصوات، نقوم بتهيئتها الآن
                 if (!correctSynth) {
                     correctSynth = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "sine" },
                         envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.5 },
-                        volume: -10 // لتقليل الصوت قليلاً
+                        volume: -10 
                     }).toDestination();
                 }
 
@@ -133,10 +121,8 @@
                 }
 
                 if (isCorrect) {
-                    // صوت تصفيق/نجاح (نغمة إيقاعية قصيرة)
                     correctSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
                 } else {
-                    // صوت خطأ (ضوضاء قصيرة)
                     incorrectSynth.triggerAttackRelease("4n");
                 }
 
@@ -144,6 +130,54 @@
                 console.error("خطأ في تشغيل الصوت:", error);
             }
         }
+
+        // ********** وظائف إدارة المؤقت **********
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const paddedMinutes = String(minutes).padStart(2, '0');
+            const paddedSeconds = String(remainingSeconds).padStart(2, '0');
+            return `${paddedMinutes}:${paddedSeconds}`;
+        }
+
+        function stopTimer() {
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+        }
+
+        function updateTimer() {
+            if (state.timeRemaining <= 0) {
+                stopTimer();
+                // انتهى الوقت، إجبار إنهاء المسابقة
+                showModal('انتهى الوقت المخصص للمسابقة!');
+                finishQuiz();
+                return;
+            }
+            state.timeRemaining--;
+            
+            // تحديث عرض المؤقت فقط في شاشة المسابقة
+            if (state.currentScreen === 'quiz') {
+                const timerElement = document.getElementById('timerDisplay');
+                if (timerElement) {
+                    timerElement.textContent = formatTime(state.timeRemaining);
+                    // تغيير لون المؤقت عندما يقترب من النهاية
+                    if (state.timeRemaining <= 30) {
+                        timerElement.classList.remove('text-gray-800');
+                        timerElement.classList.add('text-red-600', 'animate-pulse');
+                    }
+                }
+            }
+        }
+
+        function startTimer() {
+            // مسح أي مؤقت موجود أولاً
+            stopTimer();
+            // تعيين مؤقت جديد
+            state.timerInterval = setInterval(updateTimer, 1000);
+        }
+        // ****************************************
 
 
         const QUIZ_DATA = [
@@ -155,7 +189,8 @@
                     'ضمير منفصل في محل رفع.', // الإجابة الصحيحة
                     'ضمير متصل في محل جر.'
                 ],
-                correct: 2
+                correct: 2,
+                userAnswer: null // لتخزين إجابة المستخدم
             },
             {
                 q: 'الضمير المتصل الذي يقع في محل نصب مفعول به في جملة "زارَني صديقي" هو:',
@@ -165,17 +200,19 @@
                     'تاء الفاعل.',
                     'هاء الغائب المتصلة بالاسم.'
                 ],
-                correct: 1
+                correct: 1,
+                userAnswer: null
             },
             {
-            q: 'أيُّ الضمائر التالية يُعدُّ ضميراً منفصلاً لـالمخاطَب؟',
-            options: [
-                'أنا.',
-                'هم.',
-                'أنتِ.', // الإجابة الصحيحة
-                'نا المتكلمين.'
-            ],
-            correct: 2
+                q: 'أيُّ الضمائر التالية يُعدُّ ضميراً منفصلاً لـالمخاطَب؟',
+                options: [
+                    'أنا.',
+                    'هم.',
+                    'أنتِ.', // الإجابة الصحيحة
+                    'نا المتكلمين.'
+                ],
+                correct: 2,
+                userAnswer: null
             },
             {
                 q: 'جميع الضمائر المتصلة في الجمل الآتية جاءت في محل رفع، ما عدا الجملة التي فيها الضمير:',
@@ -185,7 +222,8 @@
                     'كتابُه جديد.', // الإجابة الصحيحة (الهاء هنا في محل جر بالإضافة)
                     'العمال أكلوا وشربوا.'
                 ],
-                correct: 2
+                correct: 2,
+                userAnswer: null
             },
             {
                 q: 'ما المحل الإعرابي لضمير الغائب المتصل (ه) في جملة: "إنّه طالب مجتهد"؟',
@@ -195,7 +233,8 @@
                     'في محل نصب اسم إنّ.', // الإجابة الصحيحة
                     'في محل جر بالإضافة.'
                 ],
-                correct: 2
+                correct: 2,
+                userAnswer: null
             },
             {
                 q: 'أيُّ الضمائر المنفصلة التالية يدل على الغائبات الجمع؟',
@@ -205,7 +244,8 @@
                     'هما.',
                     'نحن.'
                 ],
-                correct: 1
+                correct: 1,
+                userAnswer: null
             },
             {
                 q: 'الضمير المتصل (كاف الخطاب) في جملة "سلّمْتُ عليكَ" محله الإعرابي هو:',
@@ -215,7 +255,8 @@
                     'في محل جر بحرف الجر.', // الإجابة الصحيحة
                     'في محل جر بالإضافة.'
                 ],
-                correct: 2
+                correct: 2,
+                userAnswer: null
             },
             {
                 q: 'الضمير المتصل (المحدد بالإعراب) في فعل الأمر "اكتبي" هو:',
@@ -225,7 +266,8 @@
                     'ياء المخاطبة (في محل رفع فاعل).', // الإجابة الصحيحة
                     'ألف الاثنين.'
                 ],
-                correct: 2
+                correct: 2,
+                userAnswer: null
             },
             {
                 q: 'الضمير المنفصل المناسب الذي يحل محل الضمير المتصل (نا) في جملة "أعطانا المعلِّمُ كتاباً" مع المحافظة على المعنى هو:',
@@ -235,7 +277,8 @@
                     'أنا.',
                     'إيانا. (ضمير نصب منفصل للجمع)', // الإجابة الصحيحة
                 ],
-                correct: 3
+                correct: 3,
+                userAnswer: null
             },
             {
                 q: 'الضمائر المنفصلة جميعها تأتي في محل رفع، ما عدا ضمائر:',
@@ -245,7 +288,8 @@
                     'المتكلمين.',
                     'إيّا وأخواتها (إيّاي، إياك، إياه...).', // الإجابة الصحيحة
                 ],
-                correct: 3
+                correct: 3,
+                userAnswer: null
             }
         ];
 
@@ -253,9 +297,10 @@
             currentScreen: 'home', // 'home', 'quiz', 'results'
             userName: '',
             currentQuestionIndex: 0,
-            correctAnswers: 0,
-            incorrectAnswers: 0,
-            isLocked: false // لمنع الإجابة مرتين
+            isLocked: false, // لمنع تغيير الإجابة المختارة
+            timeLimit: 240, // 4 دقائق (240 ثانية)
+            timeRemaining: 240,
+            timerInterval: null
         };
 
         const appElement = document.getElementById('app');
@@ -271,10 +316,15 @@
         }
 
         function renderHome() {
+            stopTimer(); // التأكد من إيقاف المؤقت عند العودة للصفحة الرئيسية
+
             appElement.innerHTML = `
                 ${renderTitle()}
                 <div class="p-6 space-y-6 text-center">
                     <p class="text-gray-700 text-lg mb-4">أهلاً بك في مسابقة الضمائر!</p>
+                    <div class="bg-yellow-100 p-3 rounded-lg border border-yellow-300 mb-6">
+                        <p class="text-sm font-semibold text-gray-700">لديك <span class="text-red-500 font-bold">${state.timeLimit / 60} دقائق</span> لإكمال ${QUIZ_DATA.length} أسئلة.</p>
+                    </div>
                     <label for="nameInput" class="block text-right text-gray-800 font-medium mb-2">الرجاء إدخال الاسم واللقب:</label>
                     <input type="text" id="nameInput" value="${state.userName}"
                            class="w-full p-3 border border-gray-300 rounded-lg bg-white text-lg focus:ring-2 focus:ring-black focus:border-black transition duration-150 outline-none"
@@ -312,19 +362,29 @@
         function renderQuiz() {
             const index = state.currentQuestionIndex;
             const questionData = QUIZ_DATA[index];
+            // تحديد ما إذا كان قد تم تأكيد الإجابة في هذا السؤال (لإظهار الألوان)
+            const isAnswerConfirmed = questionData.userAnswer !== null && questionData.userAnswer === questionData.userAnswer; 
 
-            if (!questionData) {
-                state.currentScreen = 'results';
-                render();
-                return;
-            }
-            
-            // شاشة العداد
+            // حساب النتيجة الحالية
+            const correctCount = QUIZ_DATA.filter(q => q.userAnswer !== null && q.userAnswer === q.correct).length;
+            const incorrectCount = QUIZ_DATA.filter(q => q.userAnswer !== null && q.userAnswer !== q.correct).length;
+
             const scoreDisplay = `
-                <div class="flex justify-center items-center text-xl font-bold text-gray-700 mb-4">
-                    <span class="text-green-600">${state.correctAnswers}</span>
-                    <span class="mx-2 text-black">-</span>
-                    <span class="text-red-600">${state.incorrectAnswers}</span>
+                <div class="flex justify-between items-center text-xl font-bold text-gray-700 mb-4">
+                    <div class="flex items-center">
+                        <span class="text-green-600">${correctCount}</span>
+                        <span class="mx-2 text-black">-</span>
+                        <span class="text-red-600">${incorrectCount}</span>
+                    </div>
+                    <!-- عرض المؤقت -->
+                    <div class="flex items-center bg-white px-3 py-1 rounded-full shadow-md border border-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414L11 9.586V6z" clip-rule="evenodd" />
+                        </svg>
+                        <span id="timerDisplay" class="text-gray-800 font-semibold ${state.timeRemaining <= 30 ? 'text-red-600 animate-pulse' : ''}">
+                            ${formatTime(state.timeRemaining)}
+                        </span>
+                    </div>
                 </div>
             `;
 
@@ -340,31 +400,74 @@
                 </div>
                 
                 <div id="choicesContainer" class="space-y-4 mb-6">
-                    ${questionData.options.map((option, i) => `
-                        <button data-index="${i}"
-                                class="choice-btn w-full p-4 text-right text-lg rounded-lg bg-gray-100 text-gray-800 shadow-sm
-                                       focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-300">
-                            ${String.fromCharCode(0x627 + i)}) ${option}
-                        </button>
-                    `).join('')}
+                    ${questionData.options.map((option, i) => {
+                        let buttonClass = 'choice-btn w-full p-4 text-right text-lg rounded-lg bg-gray-100 text-gray-800 shadow-sm transition duration-300';
+                        
+                        if (isAnswerConfirmed) {
+                            // تم تأكيد الإجابة، نعرض الألوان ونعطل الأزرار
+                            if (i === questionData.correct) {
+                                buttonClass += ' correct disabled';
+                            } else if (i === questionData.userAnswer) {
+                                buttonClass += ' incorrect disabled';
+                            } else {
+                                buttonClass += ' disabled';
+                            }
+                        } else if (i === questionData.userAnswer) {
+                            // لم يتم التأكيد بعد، ولكن هذه الإجابة مختارة حاليًا
+                            buttonClass += ' bg-gray-300 shadow-lg'; 
+                        }
+
+                        return `
+                            <button data-index="${i}"
+                                    class="${buttonClass}"
+                                    ${isAnswerConfirmed ? 'disabled' : ''}>
+                                ${String.fromCharCode(0x627 + i)}) ${option}
+                            </button>
+                        `;
+                    }).join('')}
                 </div>
 
-                <!-- زر الانتقال التالي (مخفي مبدئياً، يظهر بعد الإجابة) -->
-                <div id="nextButtonContainer" class="hidden">
-                    <button id="nextButton" onclick="goToNextQuestion()"
-                            class="w-full bg-black text-white text-xl font-bold py-3 rounded-lg shadow-xl hover:bg-gray-800 transition duration-200">
-                        ${index + 1 === QUIZ_DATA.length ? 'عرض النتيجة' : 'السؤال التالي'}
+                <!-- أزرار التنقل والإنهاء -->
+                <div class="flex justify-between space-x-2 md:space-x-4">
+                    <!-- زر السابق -->
+                    <button onclick="goToPreviousQuestion()"
+                            class="w-1/3 bg-gray-500 text-white text-lg font-bold py-3 rounded-lg shadow-md hover:bg-gray-600 transition duration-200 disabled:opacity-50"
+                            ${index === 0 ? 'disabled' : ''}>
+                        السابق
+                    </button>
+                    
+                    <!-- زر الإجابة / التالي / إنهاء -->
+                    <button id="mainActionButton" 
+                            onclick="${index + 1 === QUIZ_DATA.length ? 'finishQuiz()' : (isAnswerConfirmed ? 'goToNextQuestion()' : 'checkAndLockAnswer()')}"
+                            class="w-2/3 text-white text-lg font-bold py-3 rounded-lg shadow-xl transition duration-200">
+                        ${index + 1 === QUIZ_DATA.length ? 'إنهاء المسابقة' : (isAnswerConfirmed ? 'السؤال التالي' : 'تأكيد الإجابة')}
                     </button>
                 </div>
             `;
             
+            // تحديث لون زر الإجراء الرئيسي بناءً على الحالة
+            const mainActionButton = document.getElementById('mainActionButton');
+            if (mainActionButton) {
+                if (index + 1 === QUIZ_DATA.length) {
+                    mainActionButton.classList.add('bg-red-600', 'hover:bg-red-700');
+                } else if (isAnswerConfirmed) {
+                    mainActionButton.classList.add('bg-black', 'hover:bg-gray-800');
+                } else {
+                    mainActionButton.classList.add('bg-green-600', 'hover:bg-green-700');
+                }
+            }
+
+
             document.querySelectorAll('.choice-btn').forEach(button => {
-                button.addEventListener('click', handleAnswer);
+                button.addEventListener('click', handleSelection);
             });
         }
 
         function renderResults() {
-            const finalScore = state.correctAnswers;
+            stopTimer(); // إيقاف المؤقت عند عرض النتائج
+            
+            // حساب النتيجة النهائية مرة أخرى
+            const finalScore = QUIZ_DATA.filter(q => q.userAnswer !== null && q.userAnswer === q.correct).length;
             const totalQuestions = QUIZ_DATA.length;
             const name = state.userName;
             let resultMessage = '';
@@ -415,74 +518,86 @@
         // --- وظائف التحكم (Control Functions) ---
 
         function startQuiz() {
-            // استبدال alert() بـ showModal()
             if (state.userName.trim() === '') {
                 showModal('الرجاء إدخال الاسم قبل البدء!');
                 return;
             }
             state.currentScreen = 'quiz';
             state.currentQuestionIndex = 0;
-            state.correctAnswers = 0;
-            state.incorrectAnswers = 0;
-            state.isLocked = false;
+            // إعادة تعيين الإجابات المحفوظة
+            QUIZ_DATA.forEach(q => q.userAnswer = null);
+
+            // ************* بدء المؤقت *************
+            state.timeRemaining = state.timeLimit;
+            startTimer();
+            // ***************************************
+
             render();
         }
 
         function restartQuiz() {
             state.currentQuestionIndex = 0;
-            state.correctAnswers = 0;
-            state.incorrectAnswers = 0;
-            state.isLocked = false;
+            QUIZ_DATA.forEach(q => q.userAnswer = null); // مسح الإجابات
             state.currentScreen = 'quiz';
+
+            // ************* إعادة تشغيل المؤقت *************
+            state.timeRemaining = state.timeLimit;
+            startTimer();
+            // ***************************************
+
             render();
         }
         
         function goToHome() {
+            stopTimer(); // إيقاف المؤقت عند العودة للصفحة الرئيسية
             state.currentScreen = 'home';
             render();
         }
 
-        // وظيفة جديدة للانتقال اليدوي للسؤال التالي
-        function goToNextQuestion() {
-            // التحقق إذا كان هذا هو السؤال الأخير قبل الانتقال إلى النتائج
-            if (state.currentQuestionIndex + 1 === QUIZ_DATA.length) {
-                state.currentScreen = 'results';
-            } else {
-                state.currentQuestionIndex++;
+        function goToPreviousQuestion() {
+            if (state.currentQuestionIndex > 0) {
+                state.currentQuestionIndex--;
+                render();
             }
-            state.isLocked = false;
+        }
+
+        function goToNextQuestion() {
+             if (state.currentQuestionIndex < QUIZ_DATA.length - 1) {
+                state.currentQuestionIndex++;
+                render();
+            } else {
+                finishQuiz(); 
+            }
+        }
+        
+        function finishQuiz() {
+            stopTimer(); // إيقاف المؤقت عند الانتهاء
+            state.currentScreen = 'results';
             render();
         }
 
+        function handleSelection(event) {
+            const selectedIndex = parseInt(event.currentTarget.dataset.index);
+            // نحفظ الإجابة فوراً
+            QUIZ_DATA[state.currentQuestionIndex].userAnswer = selectedIndex;
+            render(); // إعادة الرسم لعرض التحديد
+        }
 
-        function handleAnswer(event) {
-            if (state.isLocked) return;
-
-            state.isLocked = true;
-            const selectedButton = event.currentTarget;
-            const selectedIndex = parseInt(selectedButton.dataset.index);
+        function checkAndLockAnswer() {
             const questionData = QUIZ_DATA[state.currentQuestionIndex];
-            const correctIndex = questionData.correct;
-
-            const allButtons = document.querySelectorAll('.choice-btn');
-            allButtons.forEach(btn => btn.classList.add('disabled')); // تعطيل كل الأزرار
-
-            if (selectedIndex === correctIndex) {
-                // إجابة صحيحة
-                selectedButton.classList.add('correct');
-                state.correctAnswers++;
-                playFeedbackSound(true);
-            } else {
-                // إجابة خاطئة
-                selectedButton.classList.add('incorrect');
-                // إظهار الإجابة الصحيحة أيضاً
-                allButtons[correctIndex].classList.add('correct');
-                state.incorrectAnswers++;
-                playFeedbackSound(false);
+            
+            // إذا لم يتم اختيار إجابة، لا يمكن التأكيد
+            if (questionData.userAnswer === null) {
+                showModal('الرجاء اختيار إجابة قبل التأكيد.');
+                return;
             }
 
-            // إظهار زر الانتقال التالي يدوياً بعد إعطاء التغذية الراجعة
-            document.getElementById('nextButtonContainer').classList.remove('hidden');
+            // تشغيل صوت التغذية الراجعة
+            const isCorrect = questionData.userAnswer === questionData.correct;
+            playFeedbackSound(isCorrect);
+            
+            // إعادة الرسم لعرض اللون الصحيح/الخاطئ وتغيير الزر إلى "السؤال التالي"
+            render(); 
         }
 
         function render() {
