@@ -168,14 +168,14 @@
                 correct: 1
             },
             {
-                q: 'أيُّ الضمائر التالية يُعدُّ ضميراً منفصلاً لـالمخاطَب؟',
-                options: [
-                    'أنا.',
-                    'هم.',
-                    'أنتِ.', // الإجابة الصحيحة
-                    'نا المتكلمين.'
-                ],
-                correct: 2
+            q: 'أيُّ الضمائر التالية يُعدُّ ضميراً منفصلاً لـالمخاطَب؟',
+            options: [
+                'أنا.',
+                'هم.',
+                'أنتِ.', // الإجابة الصحيحة
+                'نا المتكلمين.'
+            ],
+            correct: 2
             },
             {
                 q: 'جميع الضمائر المتصلة في الجمل الآتية جاءت في محل رفع، ما عدا الجملة التي فيها الضمير:',
@@ -271,7 +271,6 @@
         }
 
         function renderHome() {
-            // ملاحظة: تم تغيير bg-gray-50 إلى bg-[#ffcc4e] في input و bg-white في div السؤال والإجابات يتم التحكم بها في renderQuiz.
             appElement.innerHTML = `
                 ${renderTitle()}
                 <div class="p-6 space-y-6 text-center">
@@ -333,13 +332,14 @@
                 ${renderTitle()}
                 ${scoreDisplay}
                 
+                <!-- السؤال في مربع أبيض للتباين -->
                 <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-md mb-8">
                     <p class="text-xl md:text-2xl font-semibold text-gray-900 leading-relaxed text-right">
                         السؤال ${index + 1} من ${QUIZ_DATA.length}: ${questionData.q}
                     </p>
                 </div>
                 
-                <div id="choicesContainer" class="space-y-4">
+                <div id="choicesContainer" class="space-y-4 mb-6">
                     ${questionData.options.map((option, i) => `
                         <button data-index="${i}"
                                 class="choice-btn w-full p-4 text-right text-lg rounded-lg bg-gray-100 text-gray-800 shadow-sm
@@ -347,6 +347,14 @@
                             ${String.fromCharCode(0x627 + i)}) ${option}
                         </button>
                     `).join('')}
+                </div>
+
+                <!-- زر الانتقال التالي (مخفي مبدئياً، يظهر بعد الإجابة) -->
+                <div id="nextButtonContainer" class="hidden">
+                    <button id="nextButton" onclick="goToNextQuestion()"
+                            class="w-full bg-black text-white text-xl font-bold py-3 rounded-lg shadow-xl hover:bg-gray-800 transition duration-200">
+                        ${index + 1 === QUIZ_DATA.length ? 'عرض النتيجة' : 'السؤال التالي'}
+                    </button>
                 </div>
             `;
             
@@ -377,9 +385,10 @@
             }
 
 
+            // استخدام اللون الأبيض لخلفية النتائج لتحقيق تباين جيد
             appElement.innerHTML = `
                 ${renderTitle()}
-                <div class="text-center p-6 space-y-8 bg-gray-50 rounded-lg shadow-inner">
+                <div class="text-center p-6 space-y-8 bg-white rounded-lg shadow-inner border border-gray-200">
                     <h2 class="text-3xl font-extrabold ${titleColor}">النتيجة النهائية</h2>
                     
                     <div class="text-6xl font-black text-black">
@@ -433,6 +442,18 @@
             render();
         }
 
+        // وظيفة جديدة للانتقال اليدوي للسؤال التالي
+        function goToNextQuestion() {
+            // التحقق إذا كان هذا هو السؤال الأخير قبل الانتقال إلى النتائج
+            if (state.currentQuestionIndex + 1 === QUIZ_DATA.length) {
+                state.currentScreen = 'results';
+            } else {
+                state.currentQuestionIndex++;
+            }
+            state.isLocked = false;
+            render();
+        }
+
 
         function handleAnswer(event) {
             if (state.isLocked) return;
@@ -460,12 +481,8 @@
                 playFeedbackSound(false);
             }
 
-            // الانتقال للسؤال التالي بعد تأخير
-            setTimeout(() => {
-                state.currentQuestionIndex++;
-                state.isLocked = false;
-                render();
-            }, 1500); // الانتظار 1.5 ثانية
+            // إظهار زر الانتقال التالي يدوياً بعد إعطاء التغذية الراجعة
+            document.getElementById('nextButtonContainer').classList.remove('hidden');
         }
 
         function render() {
