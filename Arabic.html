@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقة لغتي العربية</title>
+    <!-- تحميل Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- تحميل خط Inter كخط احتياطي -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <!-- تحميل مكتبة Tone.js للأصوات -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <style>
+        /* تعريف خط مناسب للغة العربية */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            /* الخلفية الرئيسية */
+            background-color: #ffcc4e; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px; 
+        }
+
+        /* تخصيص إطار التركيز في Tailwind */
+        .outline-none:focus {
+            box-shadow: none;
+        }
+
+        /* نمط الإجابات الرمادية الباهتة */
+        .choice-btn {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #D1D5DB; 
+        }
+        
+        /* نمط التفاعل عند المرور (Hover) */
+        .choice-btn:hover:not(.disabled) {
+            background-color: white !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        /* نمط الإجابات بعد الاختيار */
+        .correct {
+            background-color: #10B981 !important; /* لون أخضر جميل */
+            color: white !important;
+        }
+
+        .incorrect {
+            background-color: #EF4444 !important; /* لون أحمر */
+            color: white !important;
+        }
+
+        /* نمط مربع العنوان */
+        .quiz-title-box {
+            border-radius: 15%; 
+        }
+        /* لضمان مظهر جيد على الأجهزة المحمولة */
+        #app {
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- تم تغيير bg-white إلى bg-[#ffcc4e] -->
+    <div id="app" class="w-full max-w-lg p-6 md:p-10 shadow-2xl bg-[#ffcc4e] rounded-xl">
+        <!-- سيتم تحميل المحتوى هنا (شاشة البدء، المسابقة، النتائج) -->
+    </div>
+
+    <!-- نافذة منبثقة مخصصة (Custom Modal UI) بدلاً من alert() -->
+    <div id="customModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4" onclick="closeModal()">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-auto" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4 text-red-600">تنبيه!</h3>
+            <p id="modalMessage" class="text-gray-700 mb-6"></p>
+            <button onclick="closeModal()" class="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition">
+                حسناً
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- وظائف نافذة التنبيه المخصصة ---
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+
+        // تهيئة Tone.js للأصوات
+        let correctSynth, incorrectSynth;
+        
+        // وظيفة لتحويل Base64 إلى ArrayBuffer (غير مستخدمة الآن لكن تم الاحتفاظ بها كملاحظة)
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+        
+        // وظيفة لتشغيل الصوت بناءً على نوعه (صحيح أو خاطئ)
+        async function playFeedbackSound(isCorrect) {
+            try {
+                // يجب أولاً أن يبدأ المستخدم التفاعل، لذا نتأكد من بدء Tone.js
+                await Tone.start();
+
+                // في حال عدم تهيئة الأصوات، نقوم بتهيئتها الآن
+                if (!correctSynth) {
+                    correctSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.5 },
+                        volume: -10 // لتقليل الصوت قليلاً
+                    }).toDestination();
+                }
+
+                if (!incorrectSynth) {
+                    incorrectSynth = new Tone.NoiseSynth({
+                        noise: { type: 'pink' },
+                        envelope: { attack: 0.005, decay: 0.15, sustain: 0, release: 0.15 }
+                    }).toDestination();
+                }
+
+                if (isCorrect) {
+                    // صوت تصفيق/نجاح (نغمة إيقاعية قصيرة)
+                    correctSynth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+                } else {
+                    // صوت خطأ (ضوضاء قصيرة)
+                    incorrectSynth.triggerAttackRelease("4n");
+                }
+
+            } catch (error) {
+                console.error("خطأ في تشغيل الصوت:", error);
+            }
+        }
+
+
+        const QUIZ_DATA = [
+            {
+                q: 'في جملة: "نحن نحب اللغة العربية."، ما نوع الضمير "نحن" وما محله الإعرابي؟',
+                options: [
+                    'ضمير متصل في محل رفع.',
+                    'ضمير منفصل في محل نصب.',
+                    'ضمير منفصل في محل رفع.', // الإجابة الصحيحة
+                    'ضمير متصل في محل جر.'
+                ],
+                correct: 2
+            },
+            {
+                q: 'الضمير المتصل الذي يقع في محل نصب مفعول به في جملة "زارَني صديقي" هو:',
+                options: [
+                    'ياء المخاطبة.',
+                    'ياء المتكلم.', // الإجابة الصحيحة
+                    'تاء الفاعل.',
+                    'هاء الغائب المتصلة بالاسم.'
+                ],
+                correct: 1
+            },
+            {
+                q: 'أيُّ الضمائر التالية يُعدُّ ضميراً منفصلاً لـالمخاطَب؟',
+                options: [
+                    'أنا.',
+                    'هم.',
+                    'أنتِ.', // الإجابة الصحيحة
+                    'نا المتكلمين.'
+                ],
+                correct: 2
+            },
+            {
+                q: 'جميع الضمائر المتصلة في الجمل الآتية جاءت في محل رفع، ما عدا الجملة التي فيها الضمير:',
+                options: [
+                    'كتبتُ الدرس.',
+                    'الطالبات درسن بجد.',
+                    'كتابُه جديد.', // الإجابة الصحيحة (الهاء هنا في محل جر بالإضافة)
+                    'العمال أكلوا وشربوا.'
+                ],
+                correct: 2
+            },
+            {
+                q: 'ما المحل الإعرابي لضمير الغائب المتصل (ه) في جملة: "إنّه طالب مجتهد"؟',
+                options: [
+                    'في محل رفع فاعل.',
+                    'في محل جر بحرف الجر.',
+                    'في محل نصب اسم إنّ.', // الإجابة الصحيحة
+                    'في محل جر بالإضافة.'
+                ],
+                correct: 2
+            },
+            {
+                q: 'أيُّ الضمائر المنفصلة التالية يدل على الغائبات الجمع؟',
+                options: [
+                    'أنتم.',
+                    'هنّ.', // الإجابة الصحيحة
+                    'هما.',
+                    'نحن.'
+                ],
+                correct: 1
+            },
+            {
+                q: 'الضمير المتصل (كاف الخطاب) في جملة "سلّمْتُ عليكَ" محله الإعرابي هو:',
+                options: [
+                    'في محل رفع فاعل.',
+                    'في محل نصب مفعول به.',
+                    'في محل جر بحرف الجر.', // الإجابة الصحيحة
+                    'في محل جر بالإضافة.'
+                ],
+                correct: 2
+            },
+            {
+                q: 'الضمير المتصل (المحدد بالإعراب) في فعل الأمر "اكتبي" هو:',
+                options: [
+                    'نون النسوة.',
+                    'ياء المتكلم.',
+                    'ياء المخاطبة (في محل رفع فاعل).', // الإجابة الصحيحة
+                    'ألف الاثنين.'
+                ],
+                correct: 2
+            },
+            {
+                q: 'الضمير المنفصل المناسب الذي يحل محل الضمير المتصل (نا) في جملة "أعطانا المعلِّمُ كتاباً" مع المحافظة على المعنى هو:',
+                options: [
+                    'نحن.',
+                    'إياك.',
+                    'أنا.',
+                    'إيانا. (ضمير نصب منفصل للجمع)', // الإجابة الصحيحة
+                ],
+                correct: 3
+            },
+            {
+                q: 'الضمائر المنفصلة جميعها تأتي في محل رفع، ما عدا ضمائر:',
+                options: [
+                    'الغائبين.',
+                    'المخاطَبين.',
+                    'المتكلمين.',
+                    'إيّا وأخواتها (إيّاي، إياك، إياه...).', // الإجابة الصحيحة
+                ],
+                correct: 3
+            }
+        ];
+
+        let state = {
+            currentScreen: 'home', // 'home', 'quiz', 'results'
+            userName: '',
+            currentQuestionIndex: 0,
+            correctAnswers: 0,
+            incorrectAnswers: 0,
+            isLocked: false // لمنع الإجابة مرتين
+        };
+
+        const appElement = document.getElementById('app');
+
+        // --- وظائف العرض (Render Functions) ---
+
+        function renderTitle() {
+            return `
+                <div class="bg-black text-white text-center py-3 px-8 mb-8 quiz-title-box shadow-lg">
+                    <h1 class="text-2xl font-bold">مسابقة لغتي العربية</h1>
+                </div>
+            `;
+        }
+
+        function renderHome() {
+            // ملاحظة: تم تغيير bg-gray-50 إلى bg-[#ffcc4e] في input و bg-white في div السؤال والإجابات يتم التحكم بها في renderQuiz.
+            appElement.innerHTML = `
+                ${renderTitle()}
+                <div class="p-6 space-y-6 text-center">
+                    <p class="text-gray-700 text-lg mb-4">أهلاً بك في مسابقة الضمائر!</p>
+                    <label for="nameInput" class="block text-right text-gray-800 font-medium mb-2">الرجاء إدخال الاسم واللقب:</label>
+                    <input type="text" id="nameInput" value="${state.userName}"
+                           class="w-full p-3 border border-gray-300 rounded-lg bg-white text-lg focus:ring-2 focus:ring-black focus:border-black transition duration-150 outline-none"
+                           placeholder="اسمك هنا">
+                    
+                    <button id="startButton"
+                            class="w-full bg-black text-white text-xl font-bold py-4 rounded-lg shadow-xl hover:bg-gray-800 transition duration-200 mt-6 disabled:opacity-50"
+                            disabled>
+                        بدء المسابقة
+                    </button>
+                </div>
+            `;
+
+            const nameInput = document.getElementById('nameInput');
+            const startButton = document.getElementById('startButton');
+
+            const checkInput = () => {
+                const name = nameInput.value.trim();
+                state.userName = name;
+                startButton.disabled = name.length === 0;
+            };
+
+            nameInput.addEventListener('input', checkInput);
+            nameInput.addEventListener('change', checkInput);
+            nameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !startButton.disabled) {
+                    startQuiz();
+                }
+            });
+            checkInput(); // التحقق الأولي
+
+            startButton.onclick = startQuiz;
+        }
+
+        function renderQuiz() {
+            const index = state.currentQuestionIndex;
+            const questionData = QUIZ_DATA[index];
+
+            if (!questionData) {
+                state.currentScreen = 'results';
+                render();
+                return;
+            }
+            
+            // شاشة العداد
+            const scoreDisplay = `
+                <div class="flex justify-center items-center text-xl font-bold text-gray-700 mb-4">
+                    <span class="text-green-600">${state.correctAnswers}</span>
+                    <span class="mx-2 text-black">-</span>
+                    <span class="text-red-600">${state.incorrectAnswers}</span>
+                </div>
+            `;
+
+            appElement.innerHTML = `
+                ${renderTitle()}
+                ${scoreDisplay}
+                
+                <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-md mb-8">
+                    <p class="text-xl md:text-2xl font-semibold text-gray-900 leading-relaxed text-right">
+                        السؤال ${index + 1} من ${QUIZ_DATA.length}: ${questionData.q}
+                    </p>
+                </div>
+                
+                <div id="choicesContainer" class="space-y-4">
+                    ${questionData.options.map((option, i) => `
+                        <button data-index="${i}"
+                                class="choice-btn w-full p-4 text-right text-lg rounded-lg bg-gray-100 text-gray-800 shadow-sm
+                                       focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-300">
+                            ${String.fromCharCode(0x627 + i)}) ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.querySelectorAll('.choice-btn').forEach(button => {
+                button.addEventListener('click', handleAnswer);
+            });
+        }
+
+        function renderResults() {
+            const finalScore = state.correctAnswers;
+            const totalQuestions = QUIZ_DATA.length;
+            const name = state.userName;
+            let resultMessage = '';
+            let titleColor = 'text-green-700';
+
+            if (finalScore === totalQuestions) {
+                resultMessage = `واو يا ${name} آنت فعلاً مدهش!`;
+                titleColor = 'text-yellow-600';
+            } else if (finalScore >= 7 && finalScore <= 9) {
+                resultMessage = `رائع يا ${name} إجاباتك كانت ممتازة وتحتاج إلى تحسين.`;
+                titleColor = 'text-green-600';
+            } else if (finalScore >= 5 && finalScore <= 6) {
+                resultMessage = `أحسنت يا ${name} وعليك تحسين معلوماتك لتكون الأفضل.`;
+                titleColor = 'text-blue-600';
+            } else { // 0 to 4
+                resultMessage = `حاول يا ${name} مرة أخرى.`;
+                titleColor = 'text-red-600';
+            }
+
+
+            appElement.innerHTML = `
+                ${renderTitle()}
+                <div class="text-center p-6 space-y-8 bg-gray-50 rounded-lg shadow-inner">
+                    <h2 class="text-3xl font-extrabold ${titleColor}">النتيجة النهائية</h2>
+                    
+                    <div class="text-6xl font-black text-black">
+                        ${finalScore} / ${totalQuestions}
+                    </div>
+                    
+                    <p class="text-2xl font-bold text-gray-800 leading-relaxed">
+                        ${resultMessage}
+                    </p>
+
+                    <button onclick="restartQuiz()"
+                            class="w-full md:w-auto bg-green-600 text-white text-xl font-bold py-3 px-8 rounded-lg shadow-md hover:bg-green-700 transition duration-200">
+                        إعادة المسابقة
+                    </button>
+                    
+                    <button onclick="goToHome()"
+                            class="w-full md:w-auto bg-gray-500 text-white text-xl font-bold py-3 px-8 rounded-lg shadow-md hover:bg-gray-600 transition duration-200 mt-4 md:mt-0 md:mr-4">
+                        العودة للصفحة الرئيسية
+                    </button>
+                </div>
+            `;
+        }
+
+        // --- وظائف التحكم (Control Functions) ---
+
+        function startQuiz() {
+            // استبدال alert() بـ showModal()
+            if (state.userName.trim() === '') {
+                showModal('الرجاء إدخال الاسم قبل البدء!');
+                return;
+            }
+            state.currentScreen = 'quiz';
+            state.currentQuestionIndex = 0;
+            state.correctAnswers = 0;
+            state.incorrectAnswers = 0;
+            state.isLocked = false;
+            render();
+        }
+
+        function restartQuiz() {
+            state.currentQuestionIndex = 0;
+            state.correctAnswers = 0;
+            state.incorrectAnswers = 0;
+            state.isLocked = false;
+            state.currentScreen = 'quiz';
+            render();
+        }
+        
+        function goToHome() {
+            state.currentScreen = 'home';
+            render();
+        }
+
+
+        function handleAnswer(event) {
+            if (state.isLocked) return;
+
+            state.isLocked = true;
+            const selectedButton = event.currentTarget;
+            const selectedIndex = parseInt(selectedButton.dataset.index);
+            const questionData = QUIZ_DATA[state.currentQuestionIndex];
+            const correctIndex = questionData.correct;
+
+            const allButtons = document.querySelectorAll('.choice-btn');
+            allButtons.forEach(btn => btn.classList.add('disabled')); // تعطيل كل الأزرار
+
+            if (selectedIndex === correctIndex) {
+                // إجابة صحيحة
+                selectedButton.classList.add('correct');
+                state.correctAnswers++;
+                playFeedbackSound(true);
+            } else {
+                // إجابة خاطئة
+                selectedButton.classList.add('incorrect');
+                // إظهار الإجابة الصحيحة أيضاً
+                allButtons[correctIndex].classList.add('correct');
+                state.incorrectAnswers++;
+                playFeedbackSound(false);
+            }
+
+            // الانتقال للسؤال التالي بعد تأخير
+            setTimeout(() => {
+                state.currentQuestionIndex++;
+                state.isLocked = false;
+                render();
+            }, 1500); // الانتظار 1.5 ثانية
+        }
+
+        function render() {
+            switch (state.currentScreen) {
+                case 'home':
+                    renderHome();
+                    break;
+                case 'quiz':
+                    renderQuiz();
+                    break;
+                case 'results':
+                    renderResults();
+                    break;
+                default:
+                    renderHome();
+            }
+        }
+
+        // بدء التطبيق
+        render();
+
+    </script>
+</body>
+</html>
